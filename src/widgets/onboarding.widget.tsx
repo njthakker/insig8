@@ -6,7 +6,7 @@ import {Key} from 'components/Key'
 import {useFullSize} from 'hooks/useFullSize'
 import {observer} from 'mobx-react-lite'
 import React, {FC, useEffect, useState} from 'react'
-import {Appearance, Image, Text, View, ViewStyle} from 'react-native'
+import {Appearance, Image, Text, View, ViewStyle, useColorScheme} from 'react-native'
 import {useStore} from 'store'
 import {Widget} from 'stores/ui.store'
 import customColors from '../colors'
@@ -76,7 +76,7 @@ const SHORTCUTS = [
 export const OnboardingWidget: FC<Props> = observer(({style}) => {
   const store = useStore()
   useFullSize()
-  const colorScheme = Appearance.getColorScheme()
+  const colorScheme = useColorScheme()
   const [visible, setVisible] = useState(true)
   const [onboardingStep, setOnboardingStep] = useState(store.ui.onboardingStep)
 

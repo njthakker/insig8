@@ -1,0 +1,30 @@
+{
+  "object" : {
+    "artifacts" : [
+
+    ],
+    "dependencies" : [
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "launchatlogin-legacy",
+          "kind" : "remoteSourceControl",
+          "location" : "https://github.com/sindresorhus/LaunchAtLogin-Legacy",
+          "name" : "LaunchAtLogin"
+        },
+        "state" : {
+          "checkoutState" : {
+            "branch" : "main",
+            "revision" : "9a894d799269cb591037f9f9cb0961510d4dca81"
+          },
+          "name" : "sourceControlCheckout"
+        },
+        "subpath" : "LaunchAtLogin-Legacy"
+      }
+    ],
+    "prebuilts" : [
+
+    ]
+  },
+  "version" : 7
+}

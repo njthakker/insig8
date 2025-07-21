@@ -19,6 +19,7 @@ import {
   NativeEventSubscription,
 } from 'react-native'
 import {IRootStore} from 'store'
+import {getColorSchemeSafe, getColorSchemeAsync} from '../lib/appearance'
 import {createBaseItems} from './items'
 import MiniSearch from 'minisearch'
 import * as Sentry from '@sentry/react-native'
@@ -216,8 +217,8 @@ export const createUIStore = (root: IRootStore) => {
           parsedStore.showInAppBrowserBookMarks ?? true
         store.hasDismissedGettingStarted =
           parsedStore.hasDismissedGettingStarted ?? false
-        // Set dark mode on main thread
-        store.isDarkMode = Appearance.getColorScheme() === 'dark'
+        // Set dark mode safely
+        store.isDarkMode = getColorSchemeSafe() === 'dark'
       })
 
       insig8Native.setLaunchAtLogin(parsedStore.launchAtLogin ?? true)
@@ -234,8 +235,8 @@ export const createUIStore = (root: IRootStore) => {
     } else {
       runInAction(() => {
         store.focusedWidget = Widget.ONBOARDING
-        // Set dark mode on main thread for new users
-        store.isDarkMode = Appearance.getColorScheme() === 'dark'
+        // Set dark mode safely for new users
+        store.isDarkMode = getColorSchemeSafe() === 'dark'
       })
     }
   }
