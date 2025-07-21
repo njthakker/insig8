@@ -5,7 +5,7 @@ set -ex
 npm --no-git-tag-version version patch
 
 # DON'T BE SILLY REPLACE THIS FOR YOUR DIRECTORY
-PROJECT_DIR="macos/sol-macOS"
+PROJECT_DIR="macos/insig8-macOS"
 INFOPLIST_FILE="Info.plist"
 INFOPLIST_DIR="${PROJECT_DIR}/${INFOPLIST_FILE}"
 

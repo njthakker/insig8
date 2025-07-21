@@ -1,4 +1,4 @@
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {observer} from 'mobx-react-lite'
 import React, {useEffect, useRef} from 'react'
 import {Animated, useColorScheme} from 'react-native'
@@ -8,7 +8,7 @@ export const LoadingBar = observer(() => {
   const store = useStore()
   const isDarkMode = store.ui.isDarkMode
   const animatedBorderRef = useRef(new Animated.Value(0))
-  const accentColor = solNative.accentColor
+  const accentColor = insig8Native.accentColor
 
   useEffect(() => {
     Animated.timing(animatedBorderRef.current, {

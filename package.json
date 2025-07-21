@@ -1,20 +1,21 @@
 {
-  "name": "sol",
+  "name": "insig8",
   "version": "2.1.247",
   "private": true,
   "scripts": {
     "start": "react-native start",
     "macos": "react-native run-macos --scheme debug",
     "bump": "./scripts/bump-version.sh",
-    "permissions:reset": "tccutil reset Calendar com.ospfranco.sol && tccutil reset Accessibility com.ospfranco.sol",
-    "dev": "bundle exec fastlane dev && rimraf releases/Sol.app && open /Applications/Sol.app",
+    "permissions:reset": "tccutil reset Calendar com.insig8.insig8 && tccutil reset Accessibility com.insig8.insig8",
+    "dev": "bundle exec fastlane dev && rimraf releases/Insig8.app && open /Applications/Insig8.app",
     "release": "bundle exec fastlane release",
     "fix-dependencies": "rnx-align-deps --write",
     "appcast": "./macos/Pods/Sparkle/bin/generate_appcast releases",
-    "pods": "cd macos && rm -rf Podfile.lock && bundle exec pod install && rm .xcode.env.local && xcodebuild -resolvePackageDependencies -workspace sol.xcworkspace -scheme debug",
+    "pods": "cd macos && rm -rf Podfile.lock && bundle exec pod install && rm .xcode.env.local && xcodebuild -resolvePackageDependencies -workspace insig8.xcworkspace -scheme debug",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@expo/plist": "^0.3.5",
     "@legendapp/list": "^1.0.17",
     "@react-native-async-storage/async-storage": "^1.23.1",
     "@sentry/react-native": "6.15.0",

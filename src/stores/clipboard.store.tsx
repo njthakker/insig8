@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {autorun, makeAutoObservable, runInAction, toJS} from 'mobx'
 import {EmitterSubscription} from 'react-native'
 import {IRootStore} from 'store'
@@ -117,7 +117,7 @@ export const createClipboardStore = (root: IRootStore) => {
     setSaveHistory: (v: boolean) => {
       store.saveHistory = v
       if (!v) {
-        solNative.securelyStore('@sol.clipboard_history_v2', '[]')
+        insig8Native.securelyStore('@insig8.clipboard_history_v2', '[]')
       }
     },
     cleanUp: () => {
@@ -128,11 +128,11 @@ export const createClipboardStore = (root: IRootStore) => {
     },
   })
 
-  onTextCopiedListener = solNative.addListener(
+  onTextCopiedListener = insig8Native.addListener(
     'onTextCopied',
     store.onTextCopied,
   )
-  // onFileCopiedListener = solNative.addListener(
+  // onFileCopiedListener = insig8Native.addListener(
   //   'onFileCopied',
   //   store.onFileCopied,
   // )
@@ -154,8 +154,8 @@ export const createClipboardStore = (root: IRootStore) => {
     }
 
     if (store.saveHistory) {
-      const entry = await solNative.securelyRetrieve(
-        '@sol.clipboard_history_v2',
+      const entry = await insig8Native.securelyRetrieve(
+        '@insig8.clipboard_history_v2',
       )
 
       if (entry) {
@@ -173,8 +173,8 @@ export const createClipboardStore = (root: IRootStore) => {
     if (store.saveHistory) {
       const history = toJS(store)
       try {
-        await solNative.securelyStore(
-          '@sol.clipboard_history_v2',
+        await insig8Native.securelyStore(
+          '@insig8.clipboard_history_v2',
           JSON.stringify(history.items),
         )
       } catch (e) {

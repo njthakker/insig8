@@ -1,13 +1,13 @@
 ---
 name: Feature Request
-about: Suggest an idea or enhancement for sol
+about: Suggest an idea or enhancement for Insig8
 title: '[FEATURE] '
 labels: enhancement
 assignees: ''
 ---
 
 <!--
-Thanks for suggesting a new feature for sol!
+Thanks for suggesting a new feature for Insig8!
 Please fill out the sections below to help us understand your request.
 -->
 
@@ -41,7 +41,7 @@ Please fill out the sections below to help us understand your request.
 
 ## Impact
 
-<!-- How would this feature improve your experience with sol? -->
+<!-- How would this feature improve your experience with Insig8? -->
 
 ## Priority
 

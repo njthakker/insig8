@@ -1,5 +1,5 @@
 import {Key} from 'components/Key'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {DateTime} from 'luxon'
 import {observer} from 'mobx-react-lite'
 import React, {FC, useEffect} from 'react'
@@ -13,9 +13,9 @@ export let CalendarWidget: FC = observer(() => {
 
   useEffect(() => {
     if (focused) {
-      solNative.turnOnHorizontalArrowsListeners()
+      insig8Native.turnOnHorizontalArrowsListeners()
     } else {
-      solNative.turnOffHorizontalArrowsListeners()
+      insig8Native.turnOffHorizontalArrowsListeners()
     }
   }, [focused])
 
@@ -23,7 +23,7 @@ export let CalendarWidget: FC = observer(() => {
     return (
       <TouchableOpacity
         onPress={() => {
-          solNative.requestCalendarAccess().then(() => {
+          insig8Native.requestCalendarAccess().then(() => {
             store.ui.getCalendarAccess()
           })
         }}>

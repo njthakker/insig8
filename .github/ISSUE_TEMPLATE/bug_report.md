@@ -1,13 +1,13 @@
 ---
 name: Bug Report
-about: Create a report to help us improve sol
+about: Create a report to help us improve Insig8
 title: '[BUG] '
 labels: bug
 assignees: ''
 ---
 
 <!--
-Thanks for reporting an issue with sol!
+Thanks for reporting an issue with insig8!
 Please fill out all required sections below to help us address your issue quickly.
 -->
 
@@ -19,9 +19,9 @@ Please fill out all required sections below to help us address your issue quickl
 
 <!-- Required: Include your macOS version (e.g., macOS 14.3 Sonoma) -->
 
-**sol Version:**
+**Insig8 Version:**
 
-<!-- Required: Please provide your sol version (run `sol --version` in terminal) -->
+<!-- Required: Please provide your Insig8 version (run `insig8 --version` in terminal) -->
 
 ## Issue Description
 

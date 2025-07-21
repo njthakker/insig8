@@ -1,6 +1,6 @@
 import {captureException} from '@sentry/react-native'
 import {extractMeetingLink} from 'lib/calendar'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {DateTime} from 'luxon'
 import {makeAutoObservable, runInAction} from 'mobx'
 import {EmitterSubscription, Linking} from 'react-native'
@@ -117,7 +117,7 @@ export const createCalendarStore = (root: IRootStore) => {
     //  /_/    \_\___|\__|_|\___/|_| |_|___/
     fetchEvents: async () => {
       if (!root.ui.showUpcomingEvent) {
-        solNative.setStatusBarItemTitle('')
+        insig8Native.setStatusBarItemTitle('')
         return
       }
 
@@ -126,7 +126,7 @@ export const createCalendarStore = (root: IRootStore) => {
         return
       }
 
-      const events = await solNative.getEvents()
+      const events = await insig8Native.getEvents()
 
       runInAction(() => {
         if (root.ui.isVisible) {
@@ -140,7 +140,7 @@ export const createCalendarStore = (root: IRootStore) => {
         const upcomingEvent = store.upcomingEvent
 
         if (!upcomingEvent) {
-          solNative.setStatusBarItemTitle('')
+          insig8Native.setStatusBarItemTitle('')
           return
         }
 
@@ -148,7 +148,7 @@ export const createCalendarStore = (root: IRootStore) => {
         const minutes = lStart.diffNow('minutes').minutes
 
         if (minutes <= 0) {
-          solNative.setStatusBarItemTitle(upcomingEvent.title?.trim() ?? '')
+          insig8Native.setStatusBarItemTitle(upcomingEvent.title?.trim() ?? '')
           return
         }
 
@@ -158,7 +158,7 @@ export const createCalendarStore = (root: IRootStore) => {
           minutes - relativeHours * 60,
         )}m`
 
-        solNative.setStatusBarItemTitle(
+        insig8Native.setStatusBarItemTitle(
           `${upcomingEvent.title!.trim().substring(0, 18)}${
             upcomingEvent.title!.length > 18 ? '...' : ''
           } • ${relativeHoursStr} ${relativeMinutesStr}`,
@@ -189,7 +189,7 @@ export const createCalendarStore = (root: IRootStore) => {
     },
     getCalendarAccess: () => {
       store.calendarAuthorizationStatus =
-        solNative.getCalendarAuthorizationStatus()
+        insig8Native.getCalendarAuthorizationStatus()
     },
     onStatusBarItemClick: () => {
       const event = store.upcomingEvent
@@ -209,7 +209,7 @@ export const createCalendarStore = (root: IRootStore) => {
         try {
           Linking.openURL(eventLink)
         } catch (e) {
-          solNative.showToast(
+          insig8Native.showToast(
             `Failed to open event link: ${eventLink}`,
             'error',
           )
@@ -224,8 +224,8 @@ export const createCalendarStore = (root: IRootStore) => {
 
   store.poll()
 
-  onShowListener = solNative.addListener('onShow', store.onShow)
-  onStatusBarItemClickListener = solNative.addListener(
+  onShowListener = insig8Native.addListener('onShow', store.onShow)
+  onStatusBarItemClickListener = insig8Native.addListener(
     'onStatusBarItemClick',
     store.onStatusBarItemClick,
   )

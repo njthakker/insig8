@@ -1,7 +1,7 @@
 import {Assets} from 'assets'
 import {IRootStore} from 'store'
 import {ItemType, Widget} from './ui.store'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {Clipboard, Linking, Text, View} from 'react-native'
 import {FileIcon} from 'components/FileIcon'
 import {nanoid} from 'nanoid'
@@ -20,8 +20,8 @@ export function createBaseItems(store: IRootStore) {
       alias: 'dark',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.toggleDarkMode()
-        solNative.restart()
+        insig8Native.toggleDarkMode()
+        insig8Native.restart()
       },
     },
     {
@@ -31,11 +31,11 @@ export function createBaseItems(store: IRootStore) {
       type: ItemType.CONFIGURATION,
       callback: async () => {
         try {
-          await solNative.executeAppleScript(
+          await insig8Native.executeAppleScript(
             'tell application "Finder" to sleep',
           )
         } catch (e) {
-          solNative.showToast(`Could not sleep: ${e}`, 'error')
+          insig8Native.showToast(`Could not sleep: ${e}`, 'error')
         }
       },
     },
@@ -48,12 +48,12 @@ export function createBaseItems(store: IRootStore) {
       callback: async () => {
         store.ui.confirm('Restart Computer', async () => {
           try {
-            await solNative.executeAppleScript(
+            await insig8Native.executeAppleScript(
               'tell application "Finder" to restart',
             )
-            solNative.showToast('Restarting', 'success')
+            insig8Native.showToast('Restarting', 'success')
           } catch (e) {
-            solNative.showToast(`Could not restart: ${e}`, 'error')
+            insig8Native.showToast(`Could not restart: ${e}`, 'error')
           }
         })
       },
@@ -67,13 +67,13 @@ export function createBaseItems(store: IRootStore) {
       callback: async () => {
         try {
           store.ui.confirm('Shut Down', async () => {
-            await solNative.executeAppleScript(
+            await insig8Native.executeAppleScript(
               'tell application "Finder" to shut down',
             )
-            solNative.showToast('Shutting down', 'success')
+            insig8Native.showToast('Shutting down', 'success')
           })
         } catch (e) {
-          solNative.showToast(`Could not power off: ${e}`, 'error')
+          insig8Native.showToast(`Could not power off: ${e}`, 'error')
         }
       },
     },
@@ -83,7 +83,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'AirDrop',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.executeAppleScript(`tell application "Finder"
+        insig8Native.executeAppleScript(`tell application "Finder"
           if exists window "AirDrop" then
                   tell application "System Events" to ¬
                           tell application process "Finder" to ¬
@@ -110,18 +110,18 @@ export function createBaseItems(store: IRootStore) {
       type: ItemType.CONFIGURATION,
       callback: async () => {
         try {
-          await solNative.executeAppleScript(
+          await insig8Native.executeAppleScript(
             `tell application "System Events" to keystroke "q" using {control down, command down}`,
           )
         } catch (e) {
-          solNative.showToast(`Could not lock: ${e}`, 'error')
+          insig8Native.showToast(`Could not lock: ${e}`, 'error')
         }
       },
     },
     {
       id: 'settings',
       iconImage: Assets.SettingsIcon,
-      name: 'Sol Settings',
+      name: 'Insig8 Settings',
       alias: 'preferences',
       type: ItemType.CONFIGURATION,
       callback: () => {
@@ -152,7 +152,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to full-screen',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeFrontmostFullscreen()
+        insig8Native.resizeFrontmostFullscreen()
       },
     },
     {
@@ -167,7 +167,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to right-half',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeFrontmostRightHalf()
+        insig8Native.resizeFrontmostRightHalf()
       },
     },
     {
@@ -182,7 +182,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to left-half',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeFrontmostLeftHalf()
+        insig8Native.resizeFrontmostLeftHalf()
       },
     },
     {
@@ -197,7 +197,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to top-half',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeFrontmostTopHalf()
+        insig8Native.resizeFrontmostTopHalf()
       },
     },
     {
@@ -212,7 +212,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to bottom-half',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeFrontmostBottomHalf()
+        insig8Native.resizeFrontmostBottomHalf()
       },
     },
     {
@@ -227,7 +227,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to top-left',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeTopLeft()
+        insig8Native.resizeTopLeft()
       },
     },
     {
@@ -242,7 +242,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to top-right',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeTopRight()
+        insig8Native.resizeTopRight()
       },
     },
     {
@@ -257,7 +257,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to bottom-left',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeBottomLeft()
+        insig8Native.resizeBottomLeft()
       },
     },
     {
@@ -272,7 +272,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Resize window to bottom-right',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.resizeBottomRight()
+        insig8Native.resizeBottomRight()
       },
     },
     {
@@ -287,7 +287,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Move window to next screen',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.moveFrontmostNextScreen()
+        insig8Native.moveFrontmostNextScreen()
       },
     },
     {
@@ -302,7 +302,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Move window to previous screen',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.moveFrontmostPrevScreen()
+        insig8Native.moveFrontmostPrevScreen()
       },
     },
     {
@@ -311,7 +311,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Move window to previous space',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.moveFrontmostToPreviousSpace()
+        insig8Native.moveFrontmostToPreviousSpace()
       },
     },
     {
@@ -320,7 +320,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Move window to next space',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.moveFrontmostToNextSpace()
+        insig8Native.moveFrontmostToNextSpace()
       },
     },
     {
@@ -335,7 +335,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Move window to center',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.moveFrontmostCenter()
+        insig8Native.moveFrontmostCenter()
       },
     },
     {
@@ -361,10 +361,10 @@ export function createBaseItems(store: IRootStore) {
     {
       id: 'check_for_updates',
       icon: '🆙',
-      name: 'Check for Sol updates',
+      name: 'Check for Insig8 updates',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.checkForUpdates()
+        insig8Native.checkForUpdates()
       },
     },
     {
@@ -453,7 +453,7 @@ export function createBaseItems(store: IRootStore) {
         try {
           await Linking.openURL('~/Developer')
         } catch (e) {
-          solNative.showToast(
+          insig8Native.showToast(
             'Developer folder not found, try creating ~/Developer 😉',
             'error',
           )
@@ -479,7 +479,7 @@ export function createBaseItems(store: IRootStore) {
       callback: async () => {
         await Linking.openURL(`https://meet.google.com/new`)
 
-        solNative.executeAppleScript(`if application "Safari" is running then
+        insig8Native.executeAppleScript(`if application "Safari" is running then
           delay 3
           tell application "Safari"
             set myurl to URL of front document as string
@@ -519,7 +519,7 @@ export function createBaseItems(store: IRootStore) {
             display notification "Google Meet link copied to clipboard" with title "Link Copied" sound name "Frog"
             return
           end if
-          
+
           if (myurl contains baseUrl) then
             display notification "Google Meet could not be copied" with title "Couldn't copy Google Meet link" sound name "Frog"
           else
@@ -539,11 +539,11 @@ export function createBaseItems(store: IRootStore) {
       alias: 'Clear xcode',
       type: ItemType.CONFIGURATION,
       callback: async () => {
-        await solNative.executeBashScript(
+        await insig8Native.executeBashScript(
           'rm -rf ~/Library/Developer/Xcode/DerivedData',
         )
 
-        solNative.showToast('Cleared', 'success')
+        insig8Native.showToast('Cleared', 'success')
       },
     },
     {
@@ -553,8 +553,8 @@ export function createBaseItems(store: IRootStore) {
       type: ItemType.CONFIGURATION,
       callback: async () => {
         const id = nanoid()
-        solNative.pasteToFrontmostApp(id)
-        solNative.showToast('Generated and pasted', 'success')
+        insig8Native.pasteToFrontmostApp(id)
+        insig8Native.showToast('Generated and pasted', 'success')
       },
     },
     {
@@ -564,8 +564,8 @@ export function createBaseItems(store: IRootStore) {
       type: ItemType.CONFIGURATION,
       callback: async () => {
         const id = uuidv4()
-        solNative.pasteToFrontmostApp(id)
-        solNative.showToast('Generated and pasted', 'success')
+        insig8Native.pasteToFrontmostApp(id)
+        insig8Native.showToast('Generated and pasted', 'success')
       },
     },
     {
@@ -575,17 +575,17 @@ export function createBaseItems(store: IRootStore) {
       type: ItemType.CONFIGURATION,
       callback: async () => {
         const paragraph = chance.paragraph()
-        solNative.pasteToFrontmostApp(paragraph)
-        solNative.showToast('Generated', 'success')
+        insig8Native.pasteToFrontmostApp(paragraph)
+        insig8Native.showToast('Generated', 'success')
       },
     },
     {
-      id: 'quit_sol',
+      id: 'quit_insig8',
       icon: '💀',
-      name: 'Quit/Exit Sol',
+      name: 'Quit/Exit Insig8',
       type: ItemType.CONFIGURATION,
       callback: async () => {
-        solNative.quit()
+        insig8Native.quit()
       },
     },
     {
@@ -598,11 +598,11 @@ export function createBaseItems(store: IRootStore) {
         if (latestString)
           try {
             latestString = JSON.parse(latestString)
-            solNative.pasteToFrontmostApp(JSON.stringify(latestString, null, 2))
-            solNative.showToast('Pasted!', 'success')
+            insig8Native.pasteToFrontmostApp(JSON.stringify(latestString, null, 2))
+            insig8Native.showToast('Pasted!', 'success')
           } catch (e) {
-            solNative.pasteToFrontmostApp(latestString)
-            solNative.showToast('Not a valid JSON', 'error')
+            insig8Native.pasteToFrontmostApp(latestString)
+            insig8Native.showToast('Not a valid JSON', 'error')
           }
       },
     },
@@ -613,14 +613,14 @@ export function createBaseItems(store: IRootStore) {
       type: ItemType.CONFIGURATION,
       callback: async () => {
         try {
-          solNative.executeAppleScript(`-- get list of open apps
+          insig8Native.executeAppleScript(`-- get list of open apps
           tell application "System Events"
             set allApps to displayed name of (every process whose background only is false) as list
           end tell
-          
-          -- leave some apps open 
+
+          -- leave some apps open
           set exclusions to {"AppleScript Editor", "Automator", "Finder", "LaunchBar"}
-          
+
           -- quit each app
           repeat with thisApp in allApps
             set thisApp to thisApp as text
@@ -630,7 +630,7 @@ export function createBaseItems(store: IRootStore) {
           end repeat
           `)
         } catch (e) {
-          solNative.showToast(
+          insig8Native.showToast(
             `Could not kill all apps: ${e}. Be sure to give accessibility access`,
             'error',
           )
@@ -646,15 +646,15 @@ export function createBaseItems(store: IRootStore) {
       alias: 'wifi',
       callback: () => {
         try {
-          const res = solNative.getWifiPassword()
+          const res = insig8Native.getWifiPassword()
           if (!res) {
-            solNative.showToast(`No password found`, 'error')
+            insig8Native.showToast(`No password found`, 'error')
             return
           }
           Clipboard.setString(res.password)
-          solNative.showToast('Password copied to clipboard', 'success')
+          insig8Native.showToast('Password copied to clipboard', 'success')
         } catch (e) {
-          solNative.showToast(`Could not retrieve password: ${e}`, 'error')
+          insig8Native.showToast(`Could not retrieve password: ${e}`, 'error')
         }
       },
     },
@@ -666,16 +666,16 @@ export function createBaseItems(store: IRootStore) {
       alias: 'wifi',
       callback: () => {
         try {
-          const res = solNative.getWifiPassword()
+          const res = insig8Native.getWifiPassword()
           if (!res) {
-            solNative.showToast(`Could not retrieve password`, 'success')
+            insig8Native.showToast(`Could not retrieve password`, 'success')
             return
           }
 
           Clipboard.setString(res.password)
-          solNative.showWifiQR(res.ssid, res.password)
+          insig8Native.showWifiQR(res.ssid, res.password)
         } catch (e) {
-          solNative.showToast(`Could not retrieve password: ${e}`, 'error')
+          insig8Native.showToast(`Could not retrieve password: ${e}`, 'error')
         }
       },
     },
@@ -689,12 +689,12 @@ export function createBaseItems(store: IRootStore) {
       callback: async () => {
         store.ui.confirm('Clear Trash', async () => {
           try {
-            await solNative.executeAppleScript(
+            await insig8Native.executeAppleScript(
               `tell application "Finder" to empty trash`,
             )
-            solNative.showToast('Trash emptied', 'success')
+            insig8Native.showToast('Trash emptied', 'success')
           } catch (e) {
-            solNative.showToast(`Could not empty trash: ${e}`, 'error')
+            insig8Native.showToast(`Could not empty trash: ${e}`, 'error')
           }
         })
       },
@@ -706,10 +706,10 @@ export function createBaseItems(store: IRootStore) {
       type: ItemType.CONFIGURATION,
       callback: async () => {
         try {
-          await solNative.hideNotch()
-          solNative.showToast('Notch hidden', 'success')
+          await insig8Native.hideNotch()
+          insig8Native.showToast('Notch hidden', 'success')
         } catch (e) {
-          solNative.showToast(`Could not hide notch: ${e}`, 'error')
+          insig8Native.showToast(`Could not hide notch: ${e}`, 'error')
         }
       },
     },
@@ -718,11 +718,11 @@ export function createBaseItems(store: IRootStore) {
     //   name: 'Add VSCode bindings to Xcode',
     //   type: ItemType.CONFIGURATION,
     //   callback: async () => {
-    //     await solNative.executeBashScript(
+    //     await insig8Native.executeBashScript(
     //       `touch ~/Library/Developer/Xcode/UserData/KeyBindings/VSCodeKeyBindings.idekeybindings`,
     //     )
 
-    //     solNative.showToast('✅ Added bindings. Select them from the Xcode preferences')
+    //     insig8Native.showToast('✅ Added bindings. Select them from the Xcode preferences')
     //   },
     // }
   ]
@@ -747,7 +747,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'Success toast',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.showToast(
+        insig8Native.showToast(
           'This is a Toast test with a long test to make sure everything fits! 🍞',
           'success',
         )
@@ -759,7 +759,7 @@ export function createBaseItems(store: IRootStore) {
       name: 'error toast',
       type: ItemType.CONFIGURATION,
       callback: () => {
-        solNative.showToast(
+        insig8Native.showToast(
           'This is a Toast test with a long test to make sure everything fits! 🍞',
           'error',
         )

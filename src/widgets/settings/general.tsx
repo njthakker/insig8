@@ -3,7 +3,7 @@ import clsx from 'clsx'
 import {Dropdown} from 'components/Dropdown'
 import {Input} from 'components/Input'
 import {MySwitch} from 'components/MySwitch'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {observer} from 'mobx-react-lite'
 import {Image, ScrollView, Text, TouchableOpacity, View} from 'react-native'
 import {useStore} from 'store'
@@ -25,7 +25,7 @@ export const General = observer(() => {
         <View className="flex-1">
           <Text className="text-sm text">Open at Login</Text>
           <Text className="text-xxs text-neutral-500 dark:text-neutral-400">
-            Launch Sol when your computer starts
+            Launch Insig8 when your computer starts
           </Text>
         </View>
         <MySwitch
@@ -128,14 +128,14 @@ export const General = observer(() => {
           <TouchableOpacity
             onPress={async () => {
               try {
-                solNative.hideWindow()
-                let path = await solNative.openFilePicker()
+                insig8Native.hideWindow()
+                let path = await insig8Native.openFilePicker()
                 if (path) {
                   path = path.replace('file://', '')
                   path = decodeURI(path)
                   store.ui.addSearchFolder(path)
                 }
-                solNative.showWindow()
+                insig8Native.showWindow()
               } catch (e) {}
             }}>
             <Text className="text-blue-500">Add folder</Text>

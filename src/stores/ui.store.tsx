@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import {Assets} from 'assets'
 import {Parser} from 'expr-eval'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {CONSTANTS} from 'lib/constants'
 import {googleTranslate} from 'lib/translator'
 import {
@@ -94,7 +94,7 @@ let minisearch = new MiniSearch({
     text.toLowerCase().split(/[\s\.-]+/),
 })
 
-const userName = solNative.userName()
+const userName = insig8Native.userName()
 let defaultSearchFolders = [
   `/Users/${userName}/Downloads`,
   `/Users/${userName}/Documents`,
@@ -218,15 +218,15 @@ export const createUIStore = (root: IRootStore) => {
           parsedStore.hasDismissedGettingStarted ?? false
       })
 
-      solNative.setLaunchAtLogin(parsedStore.launchAtLogin ?? true)
-      solNative.setGlobalShortcut(parsedStore.globalShortcut)
-      solNative.setShowWindowOn(
+      insig8Native.setLaunchAtLogin(parsedStore.launchAtLogin ?? true)
+      insig8Native.setGlobalShortcut(parsedStore.globalShortcut)
+      insig8Native.setShowWindowOn(
         parsedStore.showWindowOn ?? 'screenWithFrontmost',
       )
-      solNative.setMediaKeyForwardingEnabled(store.mediaKeyForwardingEnabled)
-      solNative.updateHotkeys(toJS(store.shortcuts))
+      insig8Native.setMediaKeyForwardingEnabled(store.mediaKeyForwardingEnabled)
+      insig8Native.updateHotkeys(toJS(store.shortcuts))
 
-      store.username = solNative.userName()
+      store.username = insig8Native.userName()
       store.getApps()
       store.migrateCustomItems()
     } else {
@@ -310,7 +310,7 @@ export const createUIStore = (root: IRootStore) => {
         runInAction(() => {
           store.isLoading = true
         })
-        const fileResults = solNative.searchFiles(
+        const fileResults = insig8Native.searchFiles(
           toJS(store.searchFolders),
           store.query,
         )
@@ -497,11 +497,11 @@ export const createUIStore = (root: IRootStore) => {
       store.onboardingStep = step
     },
     setGlobalShortcut: (key: 'command' | 'option' | 'control') => {
-      solNative.setGlobalShortcut(key)
+      insig8Native.setGlobalShortcut(key)
       store.globalShortcut = key
     },
     setShowWindowOn: (on: 'screenWithFrontmost' | 'screenWithCursor') => {
-      solNative.setShowWindowOn(on)
+      insig8Native.setShowWindowOn(on)
       store.showWindowOn = on
     },
     focusWidget: (widget: Widget) => {
@@ -528,7 +528,7 @@ export const createUIStore = (root: IRootStore) => {
         }
 
         if (query === 'ip') {
-          let info = solNative.getWifiInfo()
+          let info = insig8Native.getWifiInfo()
           if (info.ip) {
             store.temporaryResult = info.ip
           }
@@ -541,7 +541,7 @@ export const createUIStore = (root: IRootStore) => {
       let appsRecord: Record<string, Item> = {}
 
       for (let {name, url, isRunning} of apps) {
-        if (name === 'sol') {
+        if (name === 'insig8') {
           continue
         }
 
@@ -550,9 +550,9 @@ export const createUIStore = (root: IRootStore) => {
         //   url.replace('file://', '') + 'Contents/Info.plist',
         // )
 
-        // if (solNative.exists(plistPath)) {
+        // if (insig8Native.exists(plistPath)) {
         //   try {
-        //     let plistContent = solNative.readFile(plistPath)
+        //     let plistContent = insig8Native.readFile(plistPath)
         //     if (plistContent != null) {
         //       const properties = plist.parse(plistContent)
         //       alias = properties.CFBundleIdentifier ?? '' + getInitials(name)
@@ -583,7 +583,7 @@ export const createUIStore = (root: IRootStore) => {
       })
     },
     getApps: () => {
-      solNative.getApplications().then(apps => {
+      insig8Native.getApplications().then(apps => {
         store.updateApps(apps)
       })
     },
@@ -641,10 +641,10 @@ export const createUIStore = (root: IRootStore) => {
     },
     getCalendarAccess: () => {
       store.calendarAuthorizationStatus =
-        solNative.getCalendarAuthorizationStatus()
+        insig8Native.getCalendarAuthorizationStatus()
     },
     getAccessibilityStatus: () => {
-      solNative.getAccessibilityStatus().then(v => {
+      insig8Native.getAccessibilityStatus().then(v => {
         runInAction(() => {
           store.isAccessibilityTrusted = v
         })
@@ -681,10 +681,10 @@ export const createUIStore = (root: IRootStore) => {
     },
     setLaunchAtLogin: (v: boolean) => {
       store.launchAtLogin = v
-      solNative.setLaunchAtLogin(v)
+      insig8Native.setLaunchAtLogin(v)
     },
     getFullDiskAccessStatus: async () => {
-      const hasAccess = await solNative.hasFullDiskAccess()
+      const hasAccess = await insig8Native.hasFullDiskAccess()
       runInAction(() => {
         store.hasFullDiskAccess = hasAccess
         if (hasAccess) {
@@ -696,7 +696,7 @@ export const createUIStore = (root: IRootStore) => {
     },
     getSafariBookmarks: async () => {
       if (store.hasFullDiskAccess) {
-        const safariBookmarksRaw = await solNative.getSafariBookmarks()
+        const safariBookmarksRaw = await insig8Native.getSafariBookmarks()
 
         runInAction(() => {
           store.safariBookmarks = safariBookmarksRaw.map(
@@ -719,12 +719,12 @@ export const createUIStore = (root: IRootStore) => {
     },
     getBraveBookmarks: async () => {
       const path = `/Users/${store.username}/Library/Application Support/BraveSoftware/Brave-Browser/Default/Bookmarks`
-      const exists = solNative.exists(path)
+      const exists = insig8Native.exists(path)
       if (!exists) {
         return
       }
 
-      const bookmarksString = solNative.readFile(path)
+      const bookmarksString = insig8Native.readFile(path)
       if (!bookmarksString) {
         return
       }
@@ -758,11 +758,11 @@ export const createUIStore = (root: IRootStore) => {
       })
     },
     getChromeBookmarks: async () => {
-      const username = solNative.userName()
+      const username = insig8Native.userName()
       const path = `/Users/${username}/Library/Application Support/Google/Chrome/Default/Bookmarks`
-      const exists = solNative.exists(path)
+      const exists = insig8Native.exists(path)
       if (exists) {
-        const bookmarksString = solNative.readFile(path)
+        const bookmarksString = insig8Native.readFile(path)
         if (!bookmarksString) {
           return
         }
@@ -792,7 +792,7 @@ export const createUIStore = (root: IRootStore) => {
 
     setMediaKeyForwardingEnabled: (enabled: boolean) => {
       store.mediaKeyForwardingEnabled = enabled
-      solNative.setMediaKeyForwardingEnabled(enabled)
+      insig8Native.setMediaKeyForwardingEnabled(enabled)
     },
 
     setTargetHeight: (height: number) => {
@@ -805,7 +805,7 @@ export const createUIStore = (root: IRootStore) => {
       colorScheme: 'light' | 'dark' | null | undefined
     }) {
       store.isDarkMode = colorScheme === 'dark'
-      solNative.restart()
+      insig8Native.restart()
     },
 
     addToHistory: (query: string) => {
@@ -850,26 +850,26 @@ export const createUIStore = (root: IRootStore) => {
       if (item.callback) {
         item.callback()
       } else if (item.url) {
-        solNative.openFile(item.url)
+        insig8Native.openFile(item.url)
       }
 
       if (itemsThatShouldShowWindow.includes(item.id)) {
-        setTimeout(solNative.showWindow, 0)
+        setTimeout(insig8Native.showWindow, 0)
       }
     },
 
     setShortcut(id: string, shortcut: string) {
       store.shortcuts[id] = shortcut
-      solNative.updateHotkeys(toJS(store.shortcuts))
+      insig8Native.updateHotkeys(toJS(store.shortcuts))
     },
 
     restoreDefaultShorcuts() {
       store.shortcuts = defaultShortcuts
-      solNative.updateHotkeys(toJS(store.shortcuts))
+      insig8Native.updateHotkeys(toJS(store.shortcuts))
     },
 
     setWindowHeight(e: any) {
-      solNative.setWindowHeight(e.nativeEvent.layout.height)
+      insig8Native.setWindowHeight(e.nativeEvent.layout.height)
     },
 
     setShowInAppBrowserBookmarks: (v: boolean) => {
@@ -943,14 +943,14 @@ export const createUIStore = (root: IRootStore) => {
     store.getFullDiskAccessStatus()
   })
 
-  onShowListener = solNative.addListener('onShow', store.onShow)
-  onHideListener = solNative.addListener('onHide', store.onHide)
-  onHotkeyListener = solNative.addListener('hotkey', store.onHotkey)
-  onAppsChangedListener = solNative.addListener(
+  onShowListener = insig8Native.addListener('onShow', store.onShow)
+  onHideListener = insig8Native.addListener('onHide', store.onHide)
+  onHotkeyListener = insig8Native.addListener('hotkey', store.onHotkey)
+  onAppsChangedListener = insig8Native.addListener(
     'applicationsChanged',
     store.applicationsChanged,
   )
-  onFileSearchListener = solNative.addListener(
+  onFileSearchListener = insig8Native.addListener(
     'onFileSearch',
     store.onFileSearch,
   )

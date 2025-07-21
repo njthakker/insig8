@@ -1,4 +1,4 @@
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {Image, ImageSourcePropType, Linking} from 'react-native'
 import {ItemType} from './ui.store'
 import {FileIcon} from 'components/FileIcon'
@@ -42,17 +42,17 @@ const iconMap: Record<string, ImageSourcePropType> = {
 
 const SYSTEM_PREFERENCE_PANES = '/System/Library/PreferencePanes'
 const GLOBAL_PREFERENCE_PANES = '/Library/PreferencePanes'
-const USER_PREFERENCE_PANES = `/Users/${solNative.userName()}/Library/PreferencePanes`
+const USER_PREFERENCE_PANES = `/Users/${insig8Native.userName()}/Library/PreferencePanes`
 
 function extractObjectFromPrefPanePath(path: string, fileName: string) {
   if (ignoreList.includes(fileName)) {
     return null
   }
 
-  let plistFileExists = solNative.exists(`${path}/Contents/Info.plist`)
+  let plistFileExists = insig8Native.exists(`${path}/Contents/Info.plist`)
 
   if (plistFileExists) {
-    let plistContent = solNative.readFile(path)
+    let plistContent = insig8Native.readFile(path)
 
     let parsed = plistContent ? plist.parse(plistContent) : null
 
@@ -80,20 +80,20 @@ function extractObjectFromPrefPanePath(path: string, fileName: string) {
   }
 }
 
-const systemPanes = solNative.exists(SYSTEM_PREFERENCE_PANES)
-  ? solNative
+const systemPanes = insig8Native.exists(SYSTEM_PREFERENCE_PANES)
+  ? insig8Native
       .ls(SYSTEM_PREFERENCE_PANES)
       .map(pane => extractObjectFromPrefPanePath(SYSTEM_PREFERENCE_PANES, pane))
   : []
 
-const globalPanes = solNative.exists(GLOBAL_PREFERENCE_PANES)
-  ? solNative
+const globalPanes = insig8Native.exists(GLOBAL_PREFERENCE_PANES)
+  ? insig8Native
       .ls(GLOBAL_PREFERENCE_PANES)
       .map(pane => extractObjectFromPrefPanePath(GLOBAL_PREFERENCE_PANES, pane))
   : []
 
-const userPanes = solNative.exists(USER_PREFERENCE_PANES)
-  ? solNative
+const userPanes = insig8Native.exists(USER_PREFERENCE_PANES)
+  ? insig8Native
       .ls(USER_PREFERENCE_PANES)
       .map(pane => extractObjectFromPrefPanePath(USER_PREFERENCE_PANES, pane))
   : []
@@ -126,7 +126,7 @@ export function buildSystemPreferenceItem({
           <FileIcon
             className="w-6 h-6"
             url={
-              solNative.OSVersion >= 13
+              insig8Native.OSVersion >= 13
                 ? '/System/Applications/System Settings.app'
                 : '/System/Applications/System Preferences.app'
             }
@@ -137,10 +137,10 @@ export function buildSystemPreferenceItem({
     },
     type: ItemType.PREFERENCE_PANE,
     callback: () => {
-      if (solNative.OSVersion >= 13) {
+      if (insig8Native.OSVersion >= 13) {
         Linking.openURL(preferenceId)
       } else {
-        solNative.executeAppleScript(`tell application "System Preferences"
+        insig8Native.executeAppleScript(`tell application "System Preferences"
         activate
         set current pane to pane "${preferenceId}"
        end tell
@@ -159,7 +159,7 @@ const manualPanes: Item[] = [
     },
     type: ItemType.PREFERENCE_PANE,
     callback: () => {
-      solNative.executeBashScript(
+      insig8Native.executeBashScript(
         'open x-apple.systempreferences:com.apple.Wallpaper-Settings.extension',
       )
     },
@@ -184,7 +184,7 @@ const manualPanes: Item[] = [
     alias: 'wifi',
     type: ItemType.PREFERENCE_PANE,
     callback: () => {
-      solNative.executeBashScript(
+      insig8Native.executeBashScript(
         'open x-apple.systempreferences:com.apple.wifi-settings-extension',
       )
     },
@@ -245,7 +245,7 @@ const manualPanes: Item[] = [
     },
     type: ItemType.PREFERENCE_PANE,
     callback: () => {
-      solNative.executeBashScript(
+      insig8Native.executeBashScript(
         'open x-apple.systempreferences:com.apple.preference.battery',
       )
     },

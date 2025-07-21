@@ -3,8 +3,8 @@ import clsx from 'clsx'
 import {BackButton} from 'components/BackButton'
 import {Input} from 'components/Input'
 import {MySwitch} from 'components/MySwitch'
-import {SolButton} from 'components/SolButton'
-import {solNative} from 'lib/SolNative'
+import {Insig8Button} from 'components/Insig8Button'
+import {insig8Native} from 'lib/Insig8Native'
 import {observer} from 'mobx-react-lite'
 import React, {FC, useEffect, useState} from 'react'
 import {Image, Text, TouchableOpacity, View, ViewStyle} from 'react-native'
@@ -45,7 +45,7 @@ export const CreateItemWidget: FC<Props> = observer(({style}) => {
   const [iconSelectorOpen, setIconSelectorOpen] = useState(false)
 
   useEffect(() => {
-    const subscription = solNative.addListener('keyDown', e => {
+    const subscription = insig8Native.addListener('keyDown', e => {
       if (isApplescript && e.keyCode === 36) {
         setText(text + '\n')
       }
@@ -187,7 +187,7 @@ export const CreateItemWidget: FC<Props> = observer(({style}) => {
         </View>
       )}
       <View className="border-t border-lightBorder dark:border-darkBorder items-end px-3 py-2 bg-gray-100 dark:bg-neutral-700">
-        <SolButton title="Create" onPress={commit} />
+        <Insig8Button title="Create" onPress={commit} />
       </View>
     </View>
   )

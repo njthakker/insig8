@@ -1,6 +1,6 @@
 import {extractMeetingLink} from 'lib/calendar'
 
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {makeAutoObservable} from 'mobx'
 import {Clipboard, EmitterSubscription, Linking} from 'react-native'
 import {IRootStore} from 'store'
@@ -101,10 +101,10 @@ export const createKeystrokeStore = (root: IRootStore) => {
                     0,
                     filePath.lastIndexOf('/'),
                   )
-                  solNative.openFinderAt(directoryPath)
+                  insig8Native.openFinderAt(directoryPath)
                 } else {
-                  solNative.openFile(file.url!)
-                  solNative.hideWindow()
+                  insig8Native.openFile(file.url!)
+                  insig8Native.hideWindow()
                 }
               }
               break
@@ -114,10 +114,10 @@ export const createKeystrokeStore = (root: IRootStore) => {
               const process =
                 root.processes.filteredProcesses[root.ui.selectedIndex]
               if (process) {
-                solNative.killProcess(process.id.toString())
+                insig8Native.killProcess(process.id.toString())
               }
-              solNative.hideWindow()
-              solNative.showToast(
+              insig8Native.hideWindow()
+              insig8Native.showToast(
                 `Process "${process.processName}" killed`,
                 'success',
               )
@@ -143,9 +143,9 @@ export const createKeystrokeStore = (root: IRootStore) => {
                   } catch (e) {
                     // console.log('could not open in browser')
                   }
-                  solNative.hideWindow()
+                  insig8Native.hideWindow()
                 } else {
-                  solNative.pasteToFrontmostApp(entry.text)
+                  insig8Native.pasteToFrontmostApp(entry.text)
                 }
               }
 
@@ -204,7 +204,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
               } else {
                 Linking.openURL('ical://')
               }
-              solNative.hideWindow()
+              insig8Native.hideWindow()
               break
             }
 
@@ -213,7 +213,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                 Clipboard.setString(
                   root.ui.translationResults[root.ui.selectedIndex],
                 )
-                solNative.hideWindow()
+                insig8Native.hideWindow()
                 root.ui.translationResults = []
               }
               break
@@ -224,7 +224,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                 !root.ui.query &&
                 root.ui.calendarAuthorizationStatus === 'notDetermined'
               ) {
-                solNative
+                insig8Native
                   .requestCalendarAccess()
                   .then(() => {
                     root.ui.getCalendarAccess()
@@ -232,27 +232,27 @@ export const createKeystrokeStore = (root: IRootStore) => {
                   .catch(e => {
                     root.ui.getCalendarAccess()
                   })
-                solNative.hideWindow()
+                insig8Native.hideWindow()
                 return
               }
 
               if (!root.ui.query && !root.ui.isAccessibilityTrusted) {
-                solNative.requestAccessibilityAccess()
-                solNative.hideWindow()
+                insig8Native.requestAccessibilityAccess()
+                insig8Native.hideWindow()
                 return
               }
 
               if (!root.ui.query) {
                 if (!root.ui.hasDismissedGettingStarted) {
                   Linking.openURL(
-                    'https://sol.ospfranco.com/getting_started',
+                    'https://www.insig8.com/getting_started',
                   ).catch(e => {
-                    solNative.showToast(
-                      `Could not open URL: https://sol.ospfranco.com/getting_started, error: ${e}`,
+                    insig8Native.showToast(
+                      `Could not open URL: https://www.insig8.com/getting_started, error: ${e}`,
                       'error',
                     )
                   })
-                  solNative.hideWindow()
+                  insig8Native.hideWindow()
                   root.ui.setHasDismissedGettingStarted(true)
                   return
                 }
@@ -294,7 +294,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                     Linking.openURL(
                       `https://google.com/search?q=${encodeURI(root.ui.query)}`,
                     ).catch(e => {
-                      solNative.showToast(
+                      insig8Native.showToast(
                         `Could not open URL: ${root.ui.query}, error: ${e}`,
                         'error',
                       )
@@ -304,7 +304,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                     Linking.openURL(
                       `https://duckduckgo.com/?q=${encodeURI(root.ui.query)}`,
                     ).catch(e => {
-                      solNative.showToast(
+                      insig8Native.showToast(
                         `Could not open URL: ${root.ui.query}, error: ${e}`,
                         'error',
                       )
@@ -314,7 +314,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                     Linking.openURL(
                       `https://bing.com/search?q=${encodeURI(root.ui.query)}`,
                     ).catch(e => {
-                      solNative.showToast(
+                      insig8Native.showToast(
                         `Could not open URL: ${root.ui.query}, error: ${e}`,
                         'error',
                       )
@@ -326,7 +326,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                         root.ui.query,
                       )}`,
                     ).catch(e => {
-                      solNative.showToast(
+                      insig8Native.showToast(
                         `Could not open URL: ${root.ui.query}, error: ${e}`,
                         'error',
                       )
@@ -336,7 +336,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                     if (
                       !isValidCustomSearchEngineUrl(root.ui.customSearchUrl)
                     ) {
-                      solNative.showToast(
+                      insig8Native.showToast(
                         `Invalid search URL. Please ensure the URL is a valid search engine URL and includes a query parameter. Example: https://google.com/search?q=%s`,
                         'error',
                       )
@@ -348,7 +348,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                         encodeURI(root.ui.query),
                       ),
                     ).catch(e => {
-                      solNative.showToast(
+                      insig8Native.showToast(
                         `Could not open URL: ${root.ui.query}, error: ${e}`,
                         'error',
                       )
@@ -356,7 +356,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                     break
                 }
 
-                solNative.hideWindow()
+                insig8Native.hideWindow()
                 return
               }
 
@@ -368,8 +368,8 @@ export const createKeystrokeStore = (root: IRootStore) => {
 
               if (item.type === ItemType.TEMPORARY_RESULT) {
                 Clipboard.setString(root.ui.temporaryResult!)
-                solNative.showToast('Copied to clipboard', 'success')
-                solNative.hideWindow()
+                insig8Native.showToast('Copied to clipboard', 'success')
+                insig8Native.hideWindow()
                 return
               }
 
@@ -379,7 +379,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
 
               // close window
               if (!item.preventClose) {
-                solNative.hideWindow()
+                insig8Native.hideWindow()
               }
 
               if (store.commandPressed && item.metaCallback) {
@@ -389,7 +389,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
                 item.callback()
                 return
               } else if (item.url) {
-                solNative.openFile(item.url)
+                insig8Native.openFile(item.url)
                 return
               }
 
@@ -399,20 +399,20 @@ export const createKeystrokeStore = (root: IRootStore) => {
                 }
 
                 if (item.isApplescript) {
-                  solNative.executeAppleScript(item.text)
+                  insig8Native.executeAppleScript(item.text)
                 } else {
                   try {
                     const canOpenURL = await Linking.canOpenURL(item.text)
                     if (canOpenURL) {
                       await Linking.openURL(item.text)
                     } else {
-                      solNative.showToast(
+                      insig8Native.showToast(
                         `Could not open URL: ${item.text}`,
                         'error',
                       )
                     }
                   } catch (e) {
-                    solNative.showToast(
+                    insig8Native.showToast(
                       `Could not open URL: ${item.text}`,
                       'error',
                     )
@@ -439,7 +439,7 @@ export const createKeystrokeStore = (root: IRootStore) => {
             case Widget.SCRATCHPAD:
             case Widget.CLIPBOARD:
             case Widget.GOOGLE_MAP:
-              solNative.hideWindow()
+              insig8Native.hideWindow()
               break
 
             default:
@@ -844,8 +844,8 @@ export const createKeystrokeStore = (root: IRootStore) => {
     },
   })
 
-  keyDownListener = solNative.addListener('keyDown', store.keyDown)
-  keyUpListener = solNative.addListener('keyUp', store.keyUp)
+  keyDownListener = insig8Native.addListener('keyDown', store.keyDown)
+  keyUpListener = insig8Native.addListener('keyUp', store.keyUp)
 
   return store
 }

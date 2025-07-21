@@ -17,7 +17,7 @@ export const About = observer(() => {
         }}
       />
       <View className="gap-2 items-center">
-        <Text className="text-3xl">Sol</Text>
+        <Text className="text-3xl">Insig8</Text>
         <Text className="darker-text text-xxs">{packageInfo.version}</Text>
         <View className="flex-row items-center gap-2">
           <Text className="">by</Text>
@@ -35,7 +35,7 @@ export const About = observer(() => {
           <TouchableOpacity
             className="bg-accent-strong p-2 rounded justify-center items-center w-48"
             onPress={() => {
-              Linking.openURL('https://sol.ospfranco.com/')
+              Linking.openURL('https://www.insig8.com/')
             }}>
             <Text className="text-white">Website</Text>
           </TouchableOpacity>

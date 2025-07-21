@@ -4,7 +4,7 @@ export const validShortcutTokensRegex =
   /^(cmd|control|option|command|shift|return|space|right|left|up|down|[a-ú]|[0-9])$/
 
 export const defaultShortcuts = {
-  // 'option+space': 'sol'
+  'command+period': 'insig8',
   resize_fullscreen: 'control+option+return',
   lock: 'command+option+q',
   resize_right_half: 'control+option+right',
@@ -17,7 +17,7 @@ export const defaultShortcuts = {
   resize_bottom_right: 'control+option+k',
   move_to_next_screen: 'control+option+shift+right',
   move_to_previous_screen: 'control+option+shift+left',
-  scratchpad: 'command+shift+space',
+  scratchpad: 'command+shift+n',
   emoji_picker: 'command+control+space',
   clipboard_manager: 'command+option+v',
 }

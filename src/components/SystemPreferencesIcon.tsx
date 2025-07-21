@@ -1,4 +1,4 @@
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import React from 'react'
 import {ViewStyle} from 'react-native'
 import {FileIcon} from './FileIcon'
@@ -9,7 +9,7 @@ export const SystemPreferencesIcon = ({style}: {style?: ViewStyle} = {}) => {
       style={style}
       className="w-6 h-6"
       url={
-        solNative.OSVersion >= 13
+        insig8Native.OSVersion >= 13
           ? '/System/Applications/System Settings.app'
           : '/System/Applications/System Preferences.app'
       }

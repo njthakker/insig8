@@ -1,4 +1,4 @@
-# Sol
+# Insig8
 
 ![Header](Header.jpg)
 
@@ -9,19 +9,19 @@
   </a>
 </div>
 
-Sol is an open source app launcher, focused on ease of use and speed. It has minimal configuration and runs natively.
+Insig8 is an open source app launcher, focused on ease of use and speed. It has minimal configuration and runs natively.
 
-[Visit official site](https://sol.ospfranco.com)
+[Visit official site](https://www.insig8.com)
 
 ## Download
 
 Install via brew
 
 ```
-brew install --cask sol
+brew install --cask insig8
 ```
 
-Or manually download the latest [release](https://github.com/ospfranco/sol/tree/main/releases).
+Or manually download the latest [release](https://github.com/ospfranco/insig8/tree/main/releases).
 
 ## Discord
 

@@ -1,6 +1,6 @@
 import {FUSE_OPTIONS} from 'config'
 import Fuse from 'fuse.js'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {makeAutoObservable} from 'mobx'
 import {IRootStore} from 'store'
 
@@ -57,7 +57,7 @@ export const createProcessesStore = (root: IRootStore) => {
     //   / ____ \ (__| |_| | (_) | | | \__ \
     //  /_/    \_\___|\__|_|\___/|_| |_|___/
     fetchProcesses: () => {
-      const processesString = solNative.ps()
+      const processesString = insig8Native.ps()
 
       const processes = processesString
         .split('\n')

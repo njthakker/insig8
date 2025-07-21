@@ -7,25 +7,25 @@ platform :mac do
       sh("bun", "bump")
     end
 
-    version = get_version_number(xcodeproj: "./macos/sol.xcodeproj")
+    version = get_version_number(xcodeproj: "./macos/insig8.xcodeproj")
 
-    path = "/Users/osp/Developer/sol/"
-    appFileName = path + "Sol.app"
+    path = "/Users/neel/Desktop/AI Experiments/Private Notetaker/JetBrains/insig8"
+    appFileName = path + "Insig8.app"
     zipFileName = path + "releases/" + version + ".zip"
-    
+
     gym(
       scheme: "release",
       configuration: "Release",
       clean: true,
-      workspace: "./macos/sol.xcworkspace",
+      workspace: "./macos/insig8.xcworkspace",
       output_directory: path,
       export_method: "developer-id"
     )
 
     notarize(
       package: appFileName,
-      bundle_id: "com.ospfranco.sol",
-      username: "ospfranco@protonmail.com",
+      bundle_id: "com.insig8.insig8",
+      username: "neelprivate@gmail.com",
       asc_provider: "24CMR7378R"
     )
 
@@ -36,7 +36,7 @@ platform :mac do
     )
 
     set_github_release(
-      repository_name: "ospfranco/sol",
+      repository_name: "njthakker/insig8",
       api_token: ENV["GITHUB_API_TOKEN"],
       name: "v" + version,
       tag_name: version,
@@ -44,9 +44,9 @@ platform :mac do
       upload_assets: [zipFileName]
     )
 
-    file_url = "https://github.com/ospfranco/sol/releases/download/" + version + "/" + version + ".zip"
-    
-    
+    file_url = "https://github.com/njthakker/insig8/releases/download/" + version + "/" + version + ".zip"
+
+
     Dir.chdir("..") do
       sh("bun", "appcast")
 
@@ -61,8 +61,8 @@ platform :mac do
 
     sh("cp", "-R", appFileName, "/Applications/")
 
-    sh("open", "/Applications/Sol.app")
+    sh("open", "/Applications/Insig8.app")
 
-    sh("pingme", "Sol " + version + " released")
+    sh("pingme", "Insig8 " + version + " released")
   end
 end

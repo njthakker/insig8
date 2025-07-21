@@ -1,4 +1,4 @@
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {observer} from 'mobx-react-lite'
 import {FC, useEffect} from 'react'
 import {TextInput, View} from 'react-native'
@@ -9,11 +9,11 @@ export const ScratchpadWidget: FC = observer(() => {
   let store = useStore()
 
   useEffect(() => {
-    solNative.turnOffVerticalArrowsListeners()
-    solNative.turnOffEnterListener()
+    insig8Native.turnOffVerticalArrowsListeners()
+    insig8Native.turnOffEnterListener()
     return () => {
-      solNative.turnOnEnterListener()
-      solNative.turnOnVerticalArrowsListeners()
+      insig8Native.turnOnEnterListener()
+      insig8Native.turnOnVerticalArrowsListeners()
     }
   }, [])
 

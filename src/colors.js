@@ -1,9 +1,9 @@
-const {solNative} = require('./lib/SolNative')
+const {insig8Native} = require('./lib/Insig8Native')
 
 const colors = {
-  accent: solNative.accentColor,
-  accentBg: `${solNative.accentColor}88`,
-  accentBg2: `${solNative.accentColor}10`,
+  accent: insig8Native.accentColor,
+  accentBg: `${insig8Native.accentColor}88`,
+  accentBg2: `${insig8Native.accentColor}10`,
 }
 
 module.exports = colors

@@ -37,7 +37,7 @@ export const PermissionsBar: FC = observer(() => {
     return (
       <View className="subBg flex-row justify-end items-center gap-1 py-2 px-4 ">
         <Text className={'text-xs darker-text mr-1'}>
-          Seems you just installed Sol, check out the getting started
+          Seems you just installed Insig8, check out the getting started
         </Text>
         <Key symbol={'⏎'} primary />
       </View>

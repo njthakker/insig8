@@ -3,7 +3,7 @@
 url="$1"
 version="$2"
 
-url_to_replace="https://raw.githubusercontent.com/ospfranco/sol/main/releases/$version.zip"
+url_to_replace="https://raw.githubusercontent.com/njthakker/insig8/main/releases/$version.zip"
 
 # XML template
 # Read XML content from file

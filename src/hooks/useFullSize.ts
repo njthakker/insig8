@@ -1,4 +1,4 @@
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {useEffect, useRef} from 'react'
 import {useStore} from 'store'
 
@@ -6,9 +6,9 @@ export function useFullSize() {
   // const store = useStore()
   // const oldHeight = useRef(store.ui.targetHeight)
   // useEffect(() => {
-  //   solNative.setWindowHeight(500)
+  //   insig8Native.setWindowHeight(500)
   //   return () => {
-  //     solNative.setWindowHeight(oldHeight.current)
+  //     insig8Native.setWindowHeight(oldHeight.current)
   //   }
   // }, [])
 }

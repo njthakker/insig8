@@ -65,8 +65,8 @@ env.json
 /fastlane/report.xml
 
 # Built binaries
-**/Sol.app
-**/Sol.app.zip
+**/Insig8.app
+**/Insig8.app.zip
 
 vendor
 
@@ -74,7 +74,7 @@ vendor
 .metro-health-check*
 
 src/env.ts
-Sol.app.zip
-Sol.app copy.zip
+Insig8.app.zip
+Insig8.app copy.zip
 sentry.properties
 releases/*.zip

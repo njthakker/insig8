@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import {MainInput} from 'components/MainInput'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {observer} from 'mobx-react-lite'
 import {FC, useEffect, useRef} from 'react'
 import {Text, View, ViewStyle, TouchableOpacity} from 'react-native'
@@ -80,9 +80,9 @@ export const EmojisWidget: FC<Props> = observer(({style}) => {
   const emojis = store.emoji.emojis
 
   useEffect(() => {
-    solNative.turnOnHorizontalArrowsListeners()
+    insig8Native.turnOnHorizontalArrowsListeners()
     return () => {
-      solNative.turnOffHorizontalArrowsListeners()
+      insig8Native.turnOffHorizontalArrowsListeners()
     }
   }, [])
 

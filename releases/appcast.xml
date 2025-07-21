@@ -1,14 +1,14 @@
 <?xml version="1.0" standalone="yes"?>
 <rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
-        <title>Sol</title>
+        <title>Insig8</title>
         <item>
             <title>2.1.247</title>
             <pubDate>Mon, 21 Jul 2025 10:13:37 +0200</pubDate>
             <sparkle:version>461</sparkle:version>
             <sparkle:shortVersionString>2.1.247</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ospfranco/sol/releases/download/2.1.247/2.1.247.zip" length="13686712" type="application/octet-stream" sparkle:edSignature="BubseFoAGpsaZ9D4iWqPAZ4aJiZi17ve1gMchULmq0iKx8wS43yFmINnfSUuy1SkGb3lO4SSl+7T1MxVLyQ0Cg=="/>
+            <enclosure url="https://github.com/njthakker/insig8/releases/download/2.1.247/2.1.247.zip" length="13686712" type="application/octet-stream" sparkle:edSignature="BubseFoAGpsaZ9D4iWqPAZ4aJiZi17ve1gMchULmq0iKx8wS43yFmINnfSUuy1SkGb3lO4SSl+7T1MxVLyQ0Cg=="/>
         </item>
         <item>
             <title>2.1.246</title>
@@ -16,7 +16,7 @@
             <sparkle:version>460</sparkle:version>
             <sparkle:shortVersionString>2.1.246</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ospfranco/sol/releases/download/2.1.246/2.1.246.zip" length="13686746" type="application/octet-stream" sparkle:edSignature="AYtPM0xJmvL6kDthXIEhDaGWjFGUFaWmh4DoHuOag6nd2mV/YZelgqE0w/BCg+eFSnaESub85VnJFRr5Stb0AQ=="/>
+            <enclosure url="https://github.com/njthakker/insig8/releases/download/2.1.246/2.1.246.zip" length="13686746" type="application/octet-stream" sparkle:edSignature="AYtPM0xJmvL6kDthXIEhDaGWjFGUFaWmh4DoHuOag6nd2mV/YZelgqE0w/BCg+eFSnaESub85VnJFRr5Stb0AQ=="/>
         </item>
         <item>
             <title>2.1.245</title>
@@ -24,7 +24,7 @@
             <sparkle:version>459</sparkle:version>
             <sparkle:shortVersionString>2.1.245</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>11.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/ospfranco/sol/releases/download/2.1.245/2.1.245.zip" length="13686734" type="application/octet-stream" sparkle:edSignature="m+bBdiGAqctlvPqfGlLDeYDuvigpBVY7Cz+Cmt9I/bMk/pLvfkQnTaLkzyRCEwvYKJuQzXoyhriA1hO6/e0QDA=="/>
+            <enclosure url="https://github.com/njthakker/insig8/releases/download/2.1.245/2.1.245.zip" length="13686734" type="application/octet-stream" sparkle:edSignature="m+bBdiGAqctlvPqfGlLDeYDuvigpBVY7Cz+Cmt9I/bMk/pLvfkQnTaLkzyRCEwvYKJuQzXoyhriA1hO6/e0QDA=="/>
         </item>
     </channel>
 </rss>

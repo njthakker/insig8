@@ -1,7 +1,7 @@
 import clsx from 'clsx'
 import {MainInput} from 'components/MainInput'
 import {useFullSize} from 'hooks/useFullSize'
-import {solNative} from 'lib/SolNative'
+import {insig8Native} from 'lib/Insig8Native'
 import {languages} from 'lib/languages'
 import {observer} from 'mobx-react-lite'
 import {FC, useEffect} from 'react'
@@ -17,10 +17,10 @@ export const TranslationWidget: FC<Props> = observer(({style}) => {
   const store = useStore()
 
   useEffect(() => {
-    solNative.turnOnHorizontalArrowsListeners()
+    insig8Native.turnOnHorizontalArrowsListeners()
 
     return () => {
-      solNative.turnOffHorizontalArrowsListeners()
+      insig8Native.turnOffHorizontalArrowsListeners()
     }
   }, [])
 
