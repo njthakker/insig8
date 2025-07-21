@@ -2,9 +2,47 @@ import Foundation
 import HotKey
 import LaunchAtLogin
 
+#if canImport(React)
+import React
+#else
+// Mock React Native types when not available
+typealias RCTPromiseResolveBlock = (Any?) -> Void
+typealias RCTPromiseRejectBlock = (String?, String?, Error?) -> Void
+
+@objc class RCTEventEmitter: NSObject {
+    override init() {
+        super.init()
+    }
+    
+    @objc func sendEvent(withName name: String, body: Any?) {
+        // Mock implementation - do nothing when React Native not available
+    }
+    
+    @objc func constantsToExport() -> [AnyHashable: Any]! {
+        return [:]
+    }
+    
+    @objc func startObserving() {
+        // Mock implementation
+    }
+    
+    @objc func stopObserving() {
+        // Mock implementation
+    }
+    
+    @objc static func requiresMainQueueSetup() -> Bool {
+        return true
+    }
+    
+    @objc func supportedEvents() -> [String]? {
+        return []
+    }
+}
+#endif
+
 private let keychain = Keychain(service: "Insig8")
 
-@objc(Insig8Native)
+@objc(Insig8Native)  
 class Insig8Native: RCTEventEmitter {
   let appDelegate = NSApp.delegate as? AppDelegate
 

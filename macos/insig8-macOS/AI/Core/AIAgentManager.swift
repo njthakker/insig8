@@ -2,15 +2,41 @@ import Foundation
 import SwiftData
 import SwiftUI
 import Combine
-import FoundationModels
-import ScreenCaptureKit
 import Speech
 import NaturalLanguage
 import CoreML
 
+// AI Compatibility - Mock implementation for now
+class AILanguageModelSession {
+    func respond(to prompt: String) async throws -> AIResponse {
+        throw AIError.serviceOffline
+    }
+}
+
+struct AIResponse {
+    let content: String
+}
+
+enum AIError: Error {
+    case serviceOffline
+    case modelNotAvailable
+    case processingFailed
+    
+    var localizedDescription: String {
+        switch self {
+        case .serviceOffline:
+            return "On device agent offline"
+        case .modelNotAvailable:
+            return "AI model not available"
+        case .processingFailed:
+            return "AI processing failed"
+        }
+    }
+}
+
 @Observable
 class AIAgentManager: ObservableObject {
-    private var foundationModel: LanguageModelSession?
+    private var foundationModel: AILanguageModelSession?
     private var commitmentTracker: CommitmentTracker?
     private var meetingProcessor: MeetingProcessor?
     private var searchEngine: IntelligentSearchEngine?
@@ -60,15 +86,20 @@ class AIAgentManager: ObservableObject {
     }
     
     private func setupFoundationModel() async throws {
-        guard #available(macOS 26.0, *) else {
-            throw AIError.unsupportedOS
-        }
-        
-        do {
-            self.foundationModel = try await LanguageModelSession()
-        } catch {
-            print("Failed to initialize Foundation Models: \(error)")
-            throw AIError.foundationModelInitFailed(error)
+        if AICapabilities.isFoundationModelsAvailable {
+            #if canImport(FoundationModels)
+            do {
+                self.foundationModel = try await LanguageModelSession()
+                print("Foundation Models initialized successfully")
+            } catch {
+                print("Failed to initialize Foundation Models: \(error)")
+                print("Falling back to mock AI processor")
+                self.foundationModel = MockLanguageModelSession()
+            }
+            #endif
+        } else {
+            print("Foundation Models not available, using fallback AI processor")
+            self.foundationModel = MockLanguageModelSession()
         }
     }
     

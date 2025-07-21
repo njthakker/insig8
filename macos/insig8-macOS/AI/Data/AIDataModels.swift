@@ -48,7 +48,7 @@ class UserPreferences {
 @Model
 class Commitment: VectorStorable {
     var id: UUID
-    var description: String
+    var commitmentText: String
     var source: CommitmentSource
     var recipient: String
     var dueDate: Date?
@@ -74,7 +74,7 @@ class Commitment: VectorStorable {
         urgencyScore: Double = 0.5
     ) {
         self.id = id
-        self.description = description
+        self.commitmentText = description
         self.source = source
         self.recipient = recipient
         self.dueDate = dueDate
@@ -140,7 +140,7 @@ class MeetingSession: VectorStorable {
 @Model
 class ActionItem {
     var id: UUID
-    var description: String
+    var itemDescription: String
     var assignee: String?
     var dueDate: Date?
     var status: ActionItemStatus
@@ -159,7 +159,7 @@ class ActionItem {
         priority: Priority = .medium
     ) {
         self.id = id
-        self.description = description
+        self.itemDescription = description
         self.assignee = assignee
         self.dueDate = dueDate
         self.status = status
@@ -262,7 +262,7 @@ class AIContext {
 
 // MARK: - Supporting Types and Enums
 
-enum CommitmentSource: Codable, CaseIterable {
+enum CommitmentSource: Codable {
     case slack(channelId: String)
     case email(messageId: String)
     case teams(conversationId: String)

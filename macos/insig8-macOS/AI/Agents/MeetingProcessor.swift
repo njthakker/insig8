@@ -1,13 +1,40 @@
 import Foundation
 import SwiftData
-import FoundationModels
 import Speech
 import AVFoundation
 import Combine
 
+// AI Compatibility - Mock implementation for now
+class AILanguageModelSession {
+    func respond(to prompt: String) async throws -> AIResponse {
+        throw AIError.serviceOffline
+    }
+}
+
+struct AIResponse {
+    let content: String
+}
+
+enum AIError: Error {
+    case serviceOffline
+    case modelNotAvailable
+    case processingFailed
+    
+    var localizedDescription: String {
+        switch self {
+        case .serviceOffline:
+            return "On device agent offline"
+        case .modelNotAvailable:
+            return "AI model not available"
+        case .processingFailed:
+            return "AI processing failed"
+        }
+    }
+}
+
 @Observable
 class MeetingProcessor: ObservableObject {
-    private let model: LanguageModelSession
+    private let model: AILanguageModelSession
     private let modelContainer: ModelContainer
     private let speechTranscriber: SpeechTranscriber
     private let audioCapture: AudioCaptureManager
@@ -55,7 +82,7 @@ class MeetingProcessor: ObservableObject {
     Transcript to summarize:
     """
     
-    init(model: LanguageModelSession, container: ModelContainer) {
+    init(model: AILanguageModelSession, container: ModelContainer) {
         self.model = model
         self.modelContainer = container
         self.speechTranscriber = SpeechTranscriber()

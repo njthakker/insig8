@@ -1,8 +1,24 @@
 import Foundation
-import ScreenCaptureKit
 import Vision
 import SwiftData
 import Combine
+
+// Screen Capture Compatibility - Mock implementation for now
+class SCCaptureEngine {
+    // Empty mock implementation
+}
+
+class SCCaptureStream {
+    // Empty mock implementation  
+}
+
+class SCCaptureScreenshot {
+    let surface: MockSurface = MockSurface()
+}
+
+class MockSurface {
+    let data: Data = Data()
+}
 
 @Observable
 class ScreenMonitor: ObservableObject {

@@ -1,12 +1,39 @@
 import Foundation
 import SwiftData
-import FoundationModels
 import Combine
+
+// AI Compatibility - Mock implementation for now
+class AILanguageModelSession {
+    func respond(to prompt: String) async throws -> AIResponse {
+        throw AIError.serviceOffline
+    }
+}
+
+struct AIResponse {
+    let content: String
+}
+
+enum AIError: Error {
+    case serviceOffline
+    case modelNotAvailable
+    case processingFailed
+    
+    var localizedDescription: String {
+        switch self {
+        case .serviceOffline:
+            return "On device agent offline"
+        case .modelNotAvailable:
+            return "AI model not available"
+        case .processingFailed:
+            return "AI processing failed"
+        }
+    }
+}
 
 @Observable
 class IntelligentSearchEngine: ObservableObject {
     private let vectorDB: VectorDatabase
-    private let model: LanguageModelSession
+    private let model: AILanguageModelSession
     private let modelContainer: ModelContainer
     private let clipboardManager: ClipboardHistoryManager
     private let browserHistoryReader: BrowserHistoryReader
@@ -33,7 +60,7 @@ class IntelligentSearchEngine: ObservableObject {
     User query: 
     """
     
-    init(vectorDB: VectorDatabase, model: LanguageModelSession, container: ModelContainer) {
+    init(vectorDB: VectorDatabase, model: AILanguageModelSession, container: ModelContainer) {
         self.vectorDB = vectorDB
         self.model = model
         self.modelContainer = container
