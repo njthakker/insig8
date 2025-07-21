@@ -68,6 +68,16 @@
 	<true/>
 	<key>NSSystemAdministrationUsageDescription</key>
 	<string>Insig8 needs permissions to read bookmarks and other files</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Insig8 needs microphone access for meeting transcription and AI voice features</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Insig8 uses speech recognition to transcribe meetings and analyze conversations for commitments</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Insig8 needs camera access for screen capture and context awareness features</string>
+	<key>NSScreenCaptureUsageDescription</key>
+	<string>Insig8 monitors screen content to detect unresponded messages and provide intelligent assistance</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Insig8 accesses contacts to identify message recipients and provide better commitment tracking</string>
 	<key>SUFeedURL</key>
 	<string>https://raw.githubusercontent.com/njthakker/insig8/main/releases/appcast.xml</string>
 	<key>SUPublicEDKey</key>

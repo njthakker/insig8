@@ -67,6 +67,9 @@ class AppDelegate: RCTAppDelegate {
 
 //    mediaKeyForwarder = MediaKeyForwarder()
 
+    // Initialize AI system
+    initializeAISystem()
+
     PanelManager.shared.showWindow()
   }
 
@@ -121,6 +124,17 @@ class AppDelegate: RCTAppDelegate {
       mediaKeyForwarder?.startEventSession()
     } else {
       mediaKeyForwarder?.stopEventSession()
+    }
+  }
+
+  private func initializeAISystem() {
+    Task {
+      do {
+        try await AIAgentManager.shared.initialize()
+        print("AI system initialized successfully")
+      } catch {
+        print("Failed to initialize AI system: \(error)")
+      }
     }
   }
 
