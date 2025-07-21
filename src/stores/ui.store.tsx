@@ -216,6 +216,8 @@ export const createUIStore = (root: IRootStore) => {
           parsedStore.showInAppBrowserBookMarks ?? true
         store.hasDismissedGettingStarted =
           parsedStore.hasDismissedGettingStarted ?? false
+        // Set dark mode on main thread
+        store.isDarkMode = Appearance.getColorScheme() === 'dark'
       })
 
       insig8Native.setLaunchAtLogin(parsedStore.launchAtLogin ?? true)
@@ -232,6 +234,8 @@ export const createUIStore = (root: IRootStore) => {
     } else {
       runInAction(() => {
         store.focusedWidget = Widget.ONBOARDING
+        // Set dark mode on main thread for new users
+        store.isDarkMode = Appearance.getColorScheme() === 'dark'
       })
     }
   }
@@ -281,7 +285,7 @@ export const createUIStore = (root: IRootStore) => {
     chromeBookmarks: [] as Item[],
     mediaKeyForwardingEnabled: true,
     targetHeight: 64,
-    isDarkMode: Appearance.getColorScheme() === 'dark',
+    isDarkMode: false, // Will be set correctly in hydrate
     history: [] as string[],
     historyPointer: 0,
     showUpcomingEvent: true,

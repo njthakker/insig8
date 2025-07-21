@@ -21,16 +21,15 @@ export const About = observer(() => {
         <Text className="darker-text text-xxs">{packageInfo.version}</Text>
         <View className="flex-row items-center gap-2">
           <Text className="">by</Text>
-          <Image source={Assets.OSP} className="h-6 w-6 rounded-full" />
-          <Text className="">ospfranco</Text>
+          <Text className="">Insig8 Team</Text>
         </View>
         <View className="flex-row gap-2 mt-8">
           <TouchableOpacity
             className="bg-accent-strong p-2 rounded justify-center items-center w-48"
             onPress={() => {
-              Linking.openURL('https://x.com/ospfranco')
+              Linking.openURL('https://github.com/njthakker/insig8')
             }}>
-            <Text className="text-white">Follow Me</Text>
+            <Text className="text-white">GitHub</Text>
           </TouchableOpacity>
           <TouchableOpacity
             className="bg-accent-strong p-2 rounded justify-center items-center w-48"

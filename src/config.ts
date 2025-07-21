@@ -21,5 +21,5 @@ if (!__DEV__) {
     enableAppHangTracking: false,
   })
 } else {
-  Sentry.setUser({email: 'ospfranco@gmail.com'})
+  Sentry.setUser({email: 'dev@insig8.com'})
 }
