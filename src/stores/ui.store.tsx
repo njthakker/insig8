@@ -808,7 +808,10 @@ export const createUIStore = (root: IRootStore) => {
     }: {
       colorScheme: 'light' | 'dark' | null | undefined
     }) {
-      store.isDarkMode = colorScheme === 'dark'
+      // Ensure this runs on main thread to avoid threading warnings
+      runInAction(() => {
+        store.isDarkMode = colorScheme === 'dark'
+      })
       insig8Native.restart()
     },
 

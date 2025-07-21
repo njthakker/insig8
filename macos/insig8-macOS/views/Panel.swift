@@ -21,7 +21,7 @@ final class Panel: NSPanel, NSWindowDelegate {
     self.isReleasedWhenClosed = false
     self.isOpaque = false
     self.delegate = self
-    self.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.2)
+    self.backgroundColor = NSColor.windowBackgroundColor.withAlphaComponent(0.95)
 
     let effectView = NSVisualEffectView(
       frame: .zero
