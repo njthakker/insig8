@@ -88,6 +88,11 @@ class Commitment: VectorStorable {
         self.urgencyScore = urgencyScore
     }
     
+    // Computed property for backward compatibility
+    var description: String {
+        return commitmentText
+    }
+    
     func generateEmbedding() async -> [Float] {
         // Implementation will use NaturalLanguage framework
         return []
@@ -167,6 +172,11 @@ class ActionItem {
         self.priority = priority
         self.createdAt = Date()
         self.updatedAt = Date()
+    }
+    
+    // Computed property for backward compatibility
+    var description: String {
+        return itemDescription
     }
 }
 

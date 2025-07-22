@@ -67,8 +67,10 @@ class KeyboardShortcutRecorderViewManager: RCTViewManager {
     return true
   }
 
-  override func view() -> NSView! {
-    return KeyboardShortcutRecorderView()
+  nonisolated override func view() -> NSView! {
+    return DispatchQueue.main.sync {
+      return KeyboardShortcutRecorderView()
+    }
   }
 
 }

@@ -35,8 +35,10 @@ class FileIconManager: RCTViewManager {
     return true
   }
 
-  override func view() -> NSView! {
-    return FileIcon()
+  nonisolated override func view() -> NSView! {
+    return DispatchQueue.main.sync {
+      return FileIcon()
+    }
   }
 
 }

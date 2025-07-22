@@ -2,38 +2,13 @@ import Foundation
 import SwiftData
 import Combine
 import UserNotifications
-
-// AI Compatibility - Mock implementation for now
-class AILanguageModelSession {
-    func respond(to prompt: String) async throws -> AIResponse {
-        throw AIError.serviceOffline
-    }
-}
-
-struct AIResponse {
-    let content: String
-}
-
-enum AIError: Error {
-    case serviceOffline
-    case modelNotAvailable
-    case processingFailed
-    
-    var localizedDescription: String {
-        switch self {
-        case .serviceOffline:
-            return "On device agent offline"
-        case .modelNotAvailable:
-            return "AI model not available"
-        case .processingFailed:
-            return "AI processing failed"
-        }
-    }
-}
+#if canImport(FoundationModels)
+import FoundationModels
+#endif
 
 @Observable
 class CommitmentTracker: ObservableObject {
-    private let model: AILanguageModelSession
+    private let model: AILanguageModelSession?
     private let vectorDB: VectorDatabase
     private let modelContainer: ModelContainer
     private let reminderScheduler: ReminderScheduler
@@ -68,7 +43,7 @@ class CommitmentTracker: ObservableObject {
     Message to analyze:
     """
     
-    init(model: AILanguageModelSession, vectorDB: VectorDatabase, container: ModelContainer) {
+    init(model: AILanguageModelSession?, vectorDB: VectorDatabase, container: ModelContainer) {
         self.model = model
         self.vectorDB = vectorDB
         self.modelContainer = container
@@ -76,12 +51,55 @@ class CommitmentTracker: ObservableObject {
     }
     
     func analyzeMessage(_ message: String, context: MessageContext) async -> Commitment? {
+        #if canImport(FoundationModels)
+        if #available(macOS 15.1, *), let model = model as? LanguageModelSession {
+            do {
+                // Use Apple Intelligence with structured output
+                let prompt = """
+                Analyze this message for commitments: \"\(message)\"
+                
+                Context: Platform: \(context.platform), Sender: \(context.sender), Time: \(context.timestamp)
+                
+                Look for promises, commitments, or follow-up actions.
+                """
+                
+                let detection: CommitmentDetection = try await model.generate(prompt: prompt)
+                
+                if detection.hasCommitment {
+                    let commitment = try await createCommitmentFromDetection(detection, message: message, context: context)
+                    
+                    // Schedule reminder
+                    scheduleReminder(for: commitment)
+                    
+                    // Store in vector database
+                    try await vectorDB.store(commitment)
+                    
+                    return commitment
+                }
+            } catch {
+                print("Failed to analyze message with Apple Intelligence: \(error)")
+                // Fall back to pattern-based detection
+                return await analyzeMessageWithFallback(message, context: context)
+            }
+        } else {
+            // Use fallback for older systems
+            return await analyzeMessageWithFallback(message, context: context)
+        }
+        #else
+        // Use fallback when Foundation Models not available
+        return await analyzeMessageWithFallback(message, context: context)
+        #endif
+    }
+    
+    private func analyzeMessageWithFallback(_ message: String, context: MessageContext) async -> Commitment? {
+        // Use the old JSON-based approach or pattern matching
         do {
             let prompt = commitmentDetectionPrompt + "\"\(message)\"\n\nContext: Platform: \(context.platform), Sender: \(context.sender), Time: \(context.timestamp)"
             
-            let response = try await model.respond(to: prompt)
+            let response = try await model?.respond(to: prompt)
             
-            if let commitmentData = parseCommitmentResponse(response.content) {
+            if let response = response,
+               let commitmentData = parseCommitmentResponse(response.content) {
                 let commitment = try await createCommitment(from: commitmentData, message: message, context: context)
                 
                 // Schedule reminder
@@ -170,8 +188,10 @@ class CommitmentTracker: ObservableObject {
     func getActiveCommitments() -> [Commitment] {
         let context = ModelContext(modelContainer)
         let descriptor = FetchDescriptor<Commitment>(
-            predicate: #Predicate { 
-                $0.status == .pending || $0.status == .inProgress || $0.status == .overdue 
+            predicate: #Predicate { commitment in
+                commitment.status.rawValue == "pending" || 
+                commitment.status.rawValue == "in_progress" || 
+                commitment.status.rawValue == "overdue" 
             },
             sortBy: [SortDescriptor(\.urgencyScore, order: .reverse)]
         )
@@ -187,7 +207,9 @@ class CommitmentTracker: ObservableObject {
     func getOverdueCommitments() -> [Commitment] {
         let context = ModelContext(modelContainer)
         let descriptor = FetchDescriptor<Commitment>(
-            predicate: #Predicate { $0.status == .overdue }
+            predicate: #Predicate { commitment in
+                commitment.status.rawValue == "overdue"
+            }
         )
         
         do {
@@ -285,6 +307,48 @@ class CommitmentTracker: ObservableObject {
         return commitment
     }
     
+    #if canImport(FoundationModels)
+    @available(macOS 15.1, *)
+    private func createCommitmentFromDetection(_ detection: CommitmentDetection, message: String, context: MessageContext) async throws -> Commitment {
+        let priority = mapUrgencyToPriority(detection.urgencyLevel)
+        let dueDate = Date().addingTimeInterval(TimeInterval(detection.suggestedReminderHours * 3600))
+        
+        let source: CommitmentSource
+        switch context.platform.lowercased() {
+        case "slack":
+            source = .slack(channelId: context.threadId ?? "unknown")
+        case "email":
+            source = .email(messageId: context.threadId ?? "unknown")
+        case "teams":
+            source = .teams(conversationId: context.threadId ?? "unknown")
+        default:
+            source = .screenCapture(timestamp: context.timestamp)
+        }
+        
+        let commitment = Commitment(
+            description: detection.description,
+            source: source,
+            recipient: detection.recipient,
+            dueDate: dueDate,
+            status: .pending,
+            priority: priority,
+            context: message,
+            relatedMessages: [message],
+            urgencyScore: mapUrgencyToScore(detection.urgencyLevel)
+        )
+        
+        // Generate embedding
+        commitment.embedding = await commitment.generateEmbedding()
+        
+        // Save to database
+        let context = ModelContext(modelContainer)
+        context.insert(commitment)
+        try context.save()
+        
+        return commitment
+    }
+    #endif
+    
     private func checkForResponse(_ commitment: Commitment) async -> Bool {
         // Search for messages from the recipient after the commitment was made
         let searchQuery = "from:\(commitment.recipient) after:\(commitment.createdAt)"
@@ -370,14 +434,7 @@ class CommitmentTracker: ObservableObject {
 
 // MARK: - Supporting Types
 
-struct CommitmentDetectionResult: Codable {
-    let hasCommitment: Bool
-    let description: String
-    let recipient: String
-    let urgencyLevel: String
-    let suggestedReminderHours: Double
-    let deadline: String?
-}
+// CommitmentDetectionResult moved to AISharedTypes.swift for reuse
 
 // MARK: - Reminder Scheduler
 

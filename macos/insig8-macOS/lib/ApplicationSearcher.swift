@@ -22,7 +22,7 @@ class Application {
   }
 }
 
-@objc public class ApplicationSearcher: NSObject {
+@objc public class ApplicationSearcher: NSObject, @unchecked Sendable {
   let searchDepth = 4
   let fileManager = FileManager()
 
@@ -35,7 +35,7 @@ class Application {
     .isApplicationKey,
   ]
 
-  @objc public static let shared = ApplicationSearcher()
+  @objc public static nonisolated(unsafe) let shared = ApplicationSearcher()
 
   // File watching
   private var eventStream: FSEventStreamRef?

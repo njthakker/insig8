@@ -3,7 +3,7 @@ import Foundation
 import React_RCTAppDelegate
 import Sparkle
 
-@NSApplicationMain
+@main
 @objc
 class AppDelegate: RCTAppDelegate {
   private var updaterController: SPUStandardUpdaterController!

@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 let appDelegate = NSApp.delegate as? AppDelegate
 
 final class Panel: NSPanel, NSWindowDelegate {

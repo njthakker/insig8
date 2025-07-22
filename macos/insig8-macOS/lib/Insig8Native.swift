@@ -40,11 +40,11 @@ typealias RCTPromiseRejectBlock = (String?, String?, Error?) -> Void
 }
 #endif
 
-private let keychain = Keychain(service: "Insig8")
+nonisolated(unsafe) private let keychain = Keychain(service: "Insig8")
 
 @objc(Insig8Native)  
 class Insig8Native: RCTEventEmitter {
-  let appDelegate = NSApp.delegate as? AppDelegate
+  @MainActor let appDelegate = NSApp.delegate as? AppDelegate
 
   override init() {
     super.init()
@@ -114,8 +114,8 @@ class Insig8Native: RCTEventEmitter {
   }
 
   @objc func openFile(_ path: String) {
-    // This is deprecated but it opens the apps with a single line of code
-    NSWorkspace.shared.openFile(path)
+    guard let url = URL(string: path) else { return }
+    NSWorkspace.shared.open(url)
   }
 
   @objc func openWithFinder(_ path: String) {
@@ -211,19 +211,19 @@ class Insig8Native: RCTEventEmitter {
       HotKeyManager.shared.mainHotKey = HotKey(
         key: .space,
         modifiers: [.command],
-        keyDownHandler: PanelManager.shared.toggle
+        keyDownHandler: PanelManager.shared.toggleFromNonisolated
       )
     } else if key == "option" {
       HotKeyManager.shared.mainHotKey = HotKey(
         key: .space,
         modifiers: [.option],
-        keyDownHandler: PanelManager.shared.toggle
+        keyDownHandler: PanelManager.shared.toggleFromNonisolated
       )
     } else if key == "control" {
       HotKeyManager.shared.mainHotKey = HotKey(
         key: .space,
         modifiers: [.control],
-        keyDownHandler: PanelManager.shared.toggle
+        keyDownHandler: PanelManager.shared.toggleFromNonisolated
       )
     }
   }
@@ -239,83 +239,124 @@ class Insig8Native: RCTEventEmitter {
     _ resolve: @escaping RCTPromiseResolveBlock,
     rejecter _: RCTPromiseRejectBlock
   ) {
+    let trustedCheckKey = kAXTrustedCheckOptionPrompt.takeRetainedValue()
+    let promptKey = trustedCheckKey as NSString
     let options: NSDictionary = [
-      kAXTrustedCheckOptionPrompt.takeRetainedValue() as NSString: true
+      promptKey: true
     ]
-    let accessibilityEnabled = AXIsProcessTrustedWithOptions(options)
-    resolve(accessibilityEnabled)
+    Task {
+      let accessibilityEnabled = AXIsProcessTrustedWithOptions(options)
+      await MainActor.run {
+        resolve(accessibilityEnabled)
+      }
+    }
   }
 
   @objc func setLaunchAtLogin(_ enabled: Bool) {
-    // TODO: Re-enable LaunchAtLogin when Xcode beta package resolution is fixed
-    // if LaunchAtLogin.isEnabled != enabled {
-    //   LaunchAtLogin.isEnabled = enabled
-    // }
-    print("LaunchAtLogin temporarily disabled due to Xcode beta issues")
+    LaunchAtLoginHelper.shared.setEnabled(enabled)
+  }
+  
+  @objc func isLaunchAtLoginEnabled(
+    _ resolve: @escaping RCTPromiseResolveBlock,
+    rejecter _: RCTPromiseRejectBlock
+  ) {
+    resolve(LaunchAtLoginHelper.shared.isEnabled)
   }
 
   @objc func resizeFrontmostTopHalf() {
-    WindowManager.sharedInstance.moveHalf(.top)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveHalf(.top)
+    }
   }
 
   @objc func resizeFrontmostBottomHalf() {
-    WindowManager.sharedInstance.moveHalf(.bottom)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveHalf(.bottom)
+    }
   }
 
   @objc func resizeFrontmostRightHalf() {
-    WindowManager.sharedInstance.moveHalf(.right)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveHalf(.right)
+    }
   }
 
   @objc func resizeFrontmostLeftHalf() {
-    WindowManager.sharedInstance.moveHalf(.left)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveHalf(.left)
+    }
   }
 
   @objc func resizeFrontmostFullscreen() {
-    WindowManager.sharedInstance.fullscreen()
+    Task { @MainActor in
+      WindowManager.sharedInstance.fullscreen()
+    }
   }
 
   @objc func resizeTopLeft() {
-    WindowManager.sharedInstance.moveQuarter(.topLeft)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveQuarter(.topLeft)
+    }
   }
 
   @objc func resizeTopRight() {
-    WindowManager.sharedInstance.moveQuarter(.topRight)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveQuarter(.topRight)
+    }
   }
 
   @objc func resizeBottomLeft() {
-    WindowManager.sharedInstance.moveQuarter(.bottomLeft)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveQuarter(.bottomLeft)
+    }
   }
 
   @objc func resizeBottomRight() {
-    WindowManager.sharedInstance.moveQuarter(.bottomRight)
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveQuarter(.bottomRight)
+    }
   }
 
   @objc func moveFrontmostNextScreen() {
-    WindowManager.sharedInstance.moveToNextScreen()
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveToNextScreen()
+    }
   }
 
   @objc func moveFrontmostPrevScreen() {
-    WindowManager.sharedInstance.moveToPrevScreen()
+    Task { @MainActor in
+      WindowManager.sharedInstance.moveToPrevScreen()
+    }
   }
 
   @objc func moveFrontmostCenter() {
-    WindowManager.sharedInstance.center()
+    Task { @MainActor in
+      WindowManager.sharedInstance.center()
+    }
   }
 
   @objc func moveFrontmostToNextSpace() {
-    WindowManager.sharedInstance.moveFrontmostToNextSpace()
+    Task { @MainActor in
+      await WindowManager.sharedInstance.moveFrontmostToNextSpace()
+    }
   }
 
   @objc func moveFrontmostToPreviousSpace() {
-    WindowManager.sharedInstance.moveFrontmostToPreviousSpace()
+    Task { @MainActor in
+      await WindowManager.sharedInstance.moveFrontmostToPreviousSpace()
+    }
   }
 
   @objc func pasteToFrontmostApp(_ content: String) {
-    ClipboardHelper.pasteToFrontmostApp(content)
+    Task { @MainActor in
+      ClipboardHelper.pasteToFrontmostApp(content)
+    }
   }
 
   @objc func insertToFrontmostApp(_ content: String) {
-    ClipboardHelper.insertToFrontmostApp(content)
+    Task { @MainActor in
+      ClipboardHelper.insertToFrontmostApp(content)
+    }
   }
 
   @objc func turnOnHorizontalArrowsListeners() {
@@ -342,7 +383,7 @@ class Insig8Native: RCTEventEmitter {
     HotKeyManager.shared.catchEnterPress = false
   }
 
-  @objc func checkForUpdates() {
+  @MainActor @objc func checkForUpdates() {
     appDelegate?.checkForUpdates()
   }
 

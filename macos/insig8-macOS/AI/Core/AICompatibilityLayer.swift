@@ -1,48 +1,13 @@
 import Foundation
 
 // MARK: - AI Compatibility Layer
-// This provides fallback implementations when advanced AI features are not available
-
-#if canImport(FoundationModels)
-import FoundationModels
-typealias AILanguageModelSession = LanguageModelSession
-let isAIAvailable = true
-#else
-// No fallback AI - just show offline message
-class AILanguageModelSession {
-    func respond(to prompt: String) async throws -> AIResponse {
-        throw AIError.serviceOffline
-    }
-}
-let isAIAvailable = false
-#endif
-
-struct AIResponse {
-    let content: String
-}
-
-enum AIError: Error {
-    case serviceOffline
-    case modelNotAvailable
-    case processingFailed
-    
-    var localizedDescription: String {
-        switch self {
-        case .serviceOffline:
-            return "On device agent offline"
-        case .modelNotAvailable:
-            return "AI model not available"
-        case .processingFailed:
-            return "AI processing failed"
-        }
-    }
-}
+// This provides feature detection and fallback implementations
 
 // MARK: - Feature Availability Checks
 struct AICapabilities {
     static var isFoundationModelsAvailable: Bool {
         #if canImport(FoundationModels)
-        if #available(macOS 26.0, *) {
+        if #available(macOS 15.1, *) {
             return true
         }
         #endif
@@ -67,6 +32,7 @@ struct AICapabilities {
 }
 
 // MARK: - Fallback AI Processing
+// These are only used when real AI models are not available
 class FallbackAIProcessor {
     static func detectCommitment(in text: String) -> CommitmentDetectionResult? {
         // Simple pattern-based commitment detection as fallback
@@ -99,17 +65,17 @@ class FallbackAIProcessor {
         return nil
     }
     
-    static func extractActionItems(from transcript: String) -> [ActionItemData] {
+    static func extractActionItems(from transcript: String) -> [ExtractedActionItem] {
         // Simple keyword-based action item extraction
         let actionKeywords = ["action", "todo", "task", "follow up", "assign", "deadline"]
         let lines = transcript.components(separatedBy: .newlines)
         
-        var actionItems: [ActionItemData] = []
+        var actionItems: [ExtractedActionItem] = []
         
         for line in lines {
             let lowercaseLine = line.lowercased()
             if actionKeywords.contains(where: { lowercaseLine.contains($0) }) {
-                actionItems.append(ActionItemData(
+                actionItems.append(ExtractedActionItem(
                     description: line,
                     assignee: nil,
                     dueDate: nil,
@@ -129,6 +95,7 @@ class FallbackAIProcessor {
     }
 }
 
+// MARK: - Fallback Result Types
 struct CommitmentDetectionResult: Codable {
     let hasCommitment: Bool
     let description: String
@@ -138,32 +105,9 @@ struct CommitmentDetectionResult: Codable {
     let deadline: String?
 }
 
-struct ActionItemData: Codable {
+struct ExtractedActionItem: Codable {
     let description: String
     let assignee: String?
     let dueDate: String?
     let priority: String
 }
-
-// MARK: - Screen Capture Compatibility
-#if canImport(ScreenCaptureKit)
-import ScreenCaptureKit
-// Use real types when available
-#else
-// Mock types when ScreenCaptureKit not available
-class SCCaptureEngine {
-    // Empty mock implementation
-}
-
-class SCCaptureStream {
-    // Empty mock implementation  
-}
-
-class SCCaptureScreenshot {
-    let surface: MockSurface = MockSurface()
-}
-
-class MockSurface {
-    let data: Data = Data()
-}
-#endif

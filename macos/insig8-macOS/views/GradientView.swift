@@ -34,7 +34,7 @@ class GradientView: NSView {
       didSet {
         let gradient2 = CAGradientLayer()
         gradient2.frame =  CGRect(origin: CGPoint.zero, size: self.frame.size)
-        gradient2.colors = [NSColor(hex: self.startColor)?.cgColor, NSColor(hex: self.endColor)?.cgColor]
+        gradient2.colors = [NSColor(hex: self.startColor)?.cgColor as Any, NSColor(hex: self.endColor)?.cgColor as Any]
         gradient2.apply(angle: self.angle)
 
         self.layer?.replaceSublayer(bgGradient, with: gradient2)
@@ -70,8 +70,10 @@ class GradientViewManager: RCTViewManager {
     return true
   }
 
-  override func view() -> NSView! {
-    return GradientView()
+  nonisolated override func view() -> NSView! {
+    return DispatchQueue.main.sync {
+      return GradientView()
+    }
   }
 
 }

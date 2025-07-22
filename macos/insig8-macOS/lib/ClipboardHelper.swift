@@ -5,7 +5,7 @@ class ClipboardHelper {
   @MainActor static var frontmostApp: (name: String, bundle: String)?
 
   static func addOnCopyListener(
-    _ callback: @escaping (_ pasteboard: NSPasteboard, _ app: (name: String, bundle: String)?) ->
+    _ callback: @escaping @Sendable (_ pasteboard: NSPasteboard, _ app: (name: String, bundle: String)?) ->
       Void
   ) {
     let pasteboard = NSPasteboard.general

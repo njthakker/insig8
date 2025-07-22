@@ -4,9 +4,9 @@ class Insig8Emitter {
 
   var hasListeners = false
 
-  public static var sharedInstance = Insig8Emitter()
+  nonisolated(unsafe) public static let sharedInstance = Insig8Emitter()
 
-  private static var emitter: Insig8Native!
+  nonisolated(unsafe) private static var emitter: Insig8Native!
 
   func registerEmitter(emitter: Insig8Native) {
     Insig8Emitter.emitter = emitter

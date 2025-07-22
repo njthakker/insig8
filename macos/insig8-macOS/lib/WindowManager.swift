@@ -32,6 +32,7 @@ enum LastAction {
   case center
 }
 
+@MainActor 
 class WindowManager {
   public static let sharedInstance = WindowManager()
 
@@ -314,8 +315,8 @@ class WindowManager {
     lastActions[identifier] = .center
   }
 
-  func moveFrontmostToPreviousSpace() {
-    PanelManager.shared.hideWindow()
+  func moveFrontmostToPreviousSpace() async {
+    await PanelManager.shared.hideWindow()
     guard let window = AccessibilityElement.frontmostWindow() else {
       NSSound.beep()
       return
@@ -363,8 +364,8 @@ class WindowManager {
     mouseUp?.post(tap: .cghidEventTap)
   }
 
-  func moveFrontmostToNextSpace() {
-    PanelManager.shared.hideWindow()
+  func moveFrontmostToNextSpace() async {
+    await PanelManager.shared.hideWindow()
     guard let window = AccessibilityElement.frontmostWindow() else {
       NSSound.beep()
       return

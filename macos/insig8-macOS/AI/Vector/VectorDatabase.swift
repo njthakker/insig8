@@ -24,13 +24,19 @@ class VectorDatabase {
     func store<T: VectorStorable>(_ item: T) async throws {
         let context = ModelContext(modelContainer)
         
+        // Create a mutable copy to work with
+        var mutableItem = item
+        
         // Generate embedding if not present
-        if item.embedding.isEmpty {
-            let embedding = await item.generateEmbedding()
-            item.embedding = embedding
+        if mutableItem.embedding.isEmpty {
+            let embedding = await mutableItem.generateEmbedding()
+            mutableItem.embedding = embedding
         }
         
-        context.insert(item as! any PersistentModel)
+        // Handle specific model types
+        if let commitment = mutableItem as? Commitment {
+            context.insert(commitment)
+        }
         try context.save()
     }
     
@@ -38,11 +44,15 @@ class VectorDatabase {
         let context = ModelContext(modelContainer)
         
         for item in items {
-            if item.embedding.isEmpty {
-                let embedding = await item.generateEmbedding()
-                item.embedding = embedding
+            var mutableItem = item
+            if mutableItem.embedding.isEmpty {
+                let embedding = await mutableItem.generateEmbedding()
+                mutableItem.embedding = embedding
             }
-            context.insert(item as! any PersistentModel)
+            // Handle specific model types
+            if let commitment = mutableItem as? Commitment {
+                context.insert(commitment)
+            }
         }
         
         try context.save()
@@ -86,9 +96,18 @@ class VectorDatabase {
         var similarItems: [T] = []
         
         for result in results {
-            if result.id != (item as? any PersistentModel)?.id {
-                if let foundItem = try? context.fetch(FetchDescriptor<T>(predicate: #Predicate { $0.id == result.id })).first {
-                    similarItems.append(foundItem)
+            // For models with UUID id, compare directly
+            let itemId = (item as? Commitment)?.id ?? UUID()
+            if result.id != itemId {
+                // Handle specific model types
+                if T.self == Commitment.self {
+                    if let foundCommitment = try? context.fetch(FetchDescriptor<Commitment>()).first(where: { commitment in
+                        return commitment.id == result.id
+                    }) {
+                        if let typedItem = foundCommitment as? T {
+                            similarItems.append(typedItem)
+                        }
+                    }
                 }
             }
         }
@@ -122,7 +141,7 @@ class VectorDatabase {
                 return VectorSearchResult(
                     id: commitment.id,
                     similarity: similarity,
-                    content: commitment.description,
+                    content: commitment.commitmentText,
                     metadata: [
                         "recipient": commitment.recipient,
                         "status": commitment.status.rawValue,
@@ -232,12 +251,12 @@ class VectorDatabase {
         let commitmentDescriptor = FetchDescriptor<Commitment>()
         if let commitments = try? context.fetch(commitmentDescriptor) {
             for commitment in commitments {
-                let score = calculateKeywordScore(keywords, in: commitment.description.lowercased())
+                let score = calculateKeywordScore(keywords, in: commitment.commitmentText.lowercased())
                 if score > 0 {
                     results.append(VectorSearchResult(
                         id: commitment.id,
                         similarity: Float(score),
-                        content: commitment.description,
+                        content: commitment.commitmentText,
                         metadata: ["type": "commitment"],
                         type: .commitment
                     ))
@@ -274,8 +293,16 @@ class VectorDatabase {
             combinedScores[result.id, default: 0] += 1.0 / Double(index + 1)
         }
         
-        // Create merged results
-        let allResults = Array(Set(semanticResults + keywordResults))
+        // Create merged results (deduplicate by id)
+        var seenIds: Set<UUID> = []
+        var allResults: [VectorSearchResult] = []
+        
+        for result in semanticResults + keywordResults {
+            if !seenIds.contains(result.id) {
+                allResults.append(result)
+                seenIds.insert(result.id)
+            }
+        }
         let sortedResults = allResults.sorted { 
             combinedScores[$0.id, default: 0] > combinedScores[$1.id, default: 0]
         }
@@ -323,7 +350,7 @@ class EmbeddingGenerator {
         
         // Get embedding vector
         if let vector = embeddingModel.vector(for: text) {
-            return Array(vector)
+            return vector.map { Float($0) }
         }
         
         return []
@@ -335,7 +362,7 @@ class EmbeddingGenerator {
         
         for chunk in chunks {
             if let vector = embeddingModel?.vector(for: chunk) {
-                embeddings.append(Array(vector))
+                embeddings.append(vector.map { Float($0) })
             }
         }
         

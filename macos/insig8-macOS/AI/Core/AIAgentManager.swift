@@ -6,82 +6,13 @@ import Speech
 import NaturalLanguage
 import CoreML
 
-// Foundation Models Integration (Swift 6.2 + macOS 26)
+// Import Apple Intelligence if available
 #if canImport(FoundationModels)
 import FoundationModels
-
-// Real Foundation Models implementation
-@available(macOS 26.0, *)
-class AILanguageModelSession {
-    private let languageModel: LanguageModelSession
-    
-    init() async throws {
-        // Initialize Apple's on-device language model
-        self.languageModel = try await LanguageModelSession()
-    }
-    
-    func respond(to prompt: String) async throws -> AIResponse {
-        do {
-            let response = try await languageModel.response(for: .init(prompt))
-            return AIResponse(content: response.content)
-        } catch {
-            throw AIError.processingFailed
-        }
-    }
-}
-
-struct AIResponse {
-    let content: String
-}
-
-enum AIError: Error {
-    case serviceOffline
-    case modelNotAvailable  
-    case processingFailed
-    
-    var localizedDescription: String {
-        switch self {
-        case .serviceOffline:
-            return "On device agent offline"
-        case .modelNotAvailable:
-            return "AI model not available"
-        case .processingFailed:
-            return "AI processing failed"
-        }
-    }
-}
-
-#else
-// Fallback for when Foundation Models not available
-class AILanguageModelSession {
-    func respond(to prompt: String) async throws -> AIResponse {
-        throw AIError.serviceOffline
-    }
-}
-
-struct AIResponse {
-    let content: String
-}
-
-enum AIError: Error {
-    case serviceOffline
-    case modelNotAvailable
-    case processingFailed
-    
-    var localizedDescription: String {
-        switch self {
-        case .serviceOffline:
-            return "On device agent offline"
-        case .modelNotAvailable:
-            return "AI model not available"
-        case .processingFailed:
-            return "AI processing failed"
-        }
-    }
-}
 #endif
 
 @Observable
+@MainActor
 class AIAgentManager: ObservableObject {
     private var foundationModel: AILanguageModelSession?
     private var commitmentTracker: CommitmentTracker?
@@ -134,49 +65,48 @@ class AIAgentManager: ObservableObject {
     
     private func setupFoundationModel() async throws {
         #if canImport(FoundationModels)
-        if #available(macOS 26.0, *) {
+        if #available(macOS 15.1, *) {
             do {
-                self.foundationModel = try await AILanguageModelSession()
-                print("✅ Foundation Models initialized successfully (Swift 6.2 + macOS 26)")
+                self.foundationModel = try await LanguageModelSession()
+                print("✅ Apple Intelligence initialized successfully")
             } catch {
-                print("⚠️ Failed to initialize Foundation Models: \(error)")
-                print("ℹ️ AI features will show 'On device agent offline'")
+                print("⚠️ Failed to initialize Apple Intelligence: \(error)")
+                print("ℹ️ AI features will use fallback implementations")
                 self.foundationModel = nil
             }
         } else {
-            print("ℹ️ Foundation Models requires macOS 26+")
+            print("ℹ️ Apple Intelligence requires macOS 15.1+")
             self.foundationModel = nil
         }
         #else
-        print("ℹ️ Foundation Models not available - AI features will show 'On device agent offline'")
+        print("ℹ️ Foundation Models not available - AI features will use fallback implementations")
         self.foundationModel = nil
         #endif
     }
     
     private func initializeAgents() async throws {
-        guard let modelContainer = modelContainer,
-              let foundationModel = foundationModel else {
+        guard let modelContainer = modelContainer else {
             throw AIError.dependenciesNotInitialized
         }
         
-        // Initialize vector database
+        // Initialize vector database (always available)
         self.vectorDatabase = VectorDatabase(container: modelContainer)
         
-        // Initialize agents
+        // Initialize agents with optional foundationModel (will use fallbacks if nil)
         self.commitmentTracker = CommitmentTracker(
-            model: foundationModel,
+            model: foundationModel, // Can be nil, will use fallbacks
             vectorDB: vectorDatabase!,
             container: modelContainer
         )
         
         self.meetingProcessor = MeetingProcessor(
-            model: foundationModel,
+            model: foundationModel, // Can be nil, will use fallbacks
             container: modelContainer
         )
         
         self.searchEngine = IntelligentSearchEngine(
             vectorDB: vectorDatabase!,
-            model: foundationModel,
+            model: foundationModel, // Can be nil, will use fallbacks
             container: modelContainer
         )
         
@@ -187,19 +117,25 @@ class AIAgentManager: ObservableObject {
         
         // Start monitoring services
         try await screenMonitor?.startMonitoring()
+        
+        if foundationModel != nil {
+            print("✅ AI Agents initialized with Apple Intelligence")
+        } else {
+            print("ℹ️ AI Agents initialized with fallback implementations")
+        }
     }
     
     func processUserAction(_ action: UserAction) async {
         switch action {
         case .detectCommitment(let message, let context):
-            await commitmentTracker?.analyzeMessage(message, context: context)
+            _ = await commitmentTracker?.analyzeMessage(message, context: context)
         case .startMeetingRecording:
             try? await meetingProcessor?.startMeetingRecording()
         case .stopMeetingRecording:
-            let session = try? await meetingProcessor?.stopMeetingRecording()
+            _ = try? await meetingProcessor?.stopMeetingRecording()
             // Handle session result
         case .searchContent(let query):
-            let results = await searchEngine?.semanticSearch(query)
+            _ = await searchEngine?.semanticSearch(query)
             // Handle search results
         }
     }
@@ -209,7 +145,9 @@ class AIAgentManager: ObservableObject {
         
         let context = ModelContext(modelContainer)
         let descriptor = FetchDescriptor<Commitment>(
-            predicate: #Predicate { $0.status == .pending || $0.status == .inProgress }
+            predicate: #Predicate { commitment in
+                commitment.status.rawValue == "pending" || commitment.status.rawValue == "in_progress"
+            }
         )
         
         do {
@@ -222,6 +160,68 @@ class AIAgentManager: ObservableObject {
     
     func processMeetingAudio(_ audio: AudioData) async -> MeetingTranscript? {
         return await meetingProcessor?.transcribeAudio(audio)
+    }
+    
+    // MARK: - Public API for AIBridge
+    
+    // Commitment Tracker Interface
+    func analyzeMessage(_ message: String, context: MessageContext) async -> Commitment? {
+        return await commitmentTracker?.analyzeMessage(message, context: context)
+    }
+    
+    func updateCommitmentStatus(_ uuid: UUID, status: CommitmentStatus) async {
+        await commitmentTracker?.updateCommitmentStatus(uuid, status: status)
+    }
+    
+    func snoozeCommitment(_ uuid: UUID, until: Date) async {
+        await commitmentTracker?.snoozeCommitment(uuid, until: until)
+    }
+    
+    // Meeting Processor Interface
+    func startMeetingRecording() async throws {
+        try await meetingProcessor?.startMeetingRecording()
+    }
+    
+    func stopMeetingRecording() async throws -> MeetingSession? {
+        return try await meetingProcessor?.stopMeetingRecording()
+    }
+    
+    func getMeetingHistory(limit: Int) -> [MeetingSession] {
+        return meetingProcessor?.getMeetingHistory(limit: limit) ?? []
+    }
+    
+    // Search Engine Interface
+    func semanticSearch(_ query: String) async -> [SearchResult] {
+        return await searchEngine?.semanticSearch(query) ?? []
+    }
+    
+    func globalSearch(_ query: String, limit: Int) async -> GlobalSearchResults? {
+        return await searchEngine?.globalSearch(query, limit: limit)
+    }
+    
+    func searchCommitments(_ query: String) async -> [Commitment] {
+        return await searchEngine?.searchCommitments(query) ?? []
+    }
+    
+    func searchMeetings(_ query: String) async -> [MeetingSession] {
+        return await searchEngine?.searchMeetings(query) ?? []
+    }
+    
+    func searchClipboardHistory(_ query: String) async -> [ClipboardItem] {
+        return await searchEngine?.searchClipboardHistory(query) ?? []
+    }
+    
+    // Screen Monitor Interface
+    func startScreenMonitoring() async throws {
+        try await screenMonitor?.startMonitoring()
+    }
+    
+    func stopScreenMonitoring() {
+        screenMonitor?.stopMonitoring()
+    }
+    
+    func detectUnrespondedMessages() async -> [UnrespondedMessage] {
+        return await screenMonitor?.detectUnrespondedMessages() ?? []
     }
     
     func shutdown() {
@@ -259,25 +259,4 @@ struct MeetingTranscript {
     let confidence: Double
 }
 
-enum AIError: Error, LocalizedError {
-    case unsupportedOS
-    case foundationModelInitFailed(Error)
-    case dependenciesNotInitialized
-    case permissionDenied(String)
-    case vectorDatabaseError(Error)
-    
-    var errorDescription: String? {
-        switch self {
-        case .unsupportedOS:
-            return "macOS 26 or later is required for AI features"
-        case .foundationModelInitFailed(let error):
-            return "Failed to initialize Foundation Models: \(error.localizedDescription)"
-        case .dependenciesNotInitialized:
-            return "AI dependencies not properly initialized"
-        case .permissionDenied(let permission):
-            return "Permission denied: \(permission)"
-        case .vectorDatabaseError(let error):
-            return "Vector database error: \(error.localizedDescription)"
-        }
-    }
-}
+// AIError is defined in AISharedTypes.swift - remove duplicate

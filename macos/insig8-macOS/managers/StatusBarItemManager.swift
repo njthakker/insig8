@@ -1,5 +1,5 @@
 class StatusBarItemManager {
-  static public let shared = StatusBarItemManager()
+  nonisolated(unsafe) static public let shared = StatusBarItemManager()
 
   private var statusBarItem: NSStatusItem?
 

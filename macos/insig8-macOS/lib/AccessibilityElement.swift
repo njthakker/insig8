@@ -5,7 +5,7 @@ import Carbon
 let kAXEnhancedUserInterface: String = "AXEnhancedUserInterface"
 
 class AccessibilityElement {
-  static let systemWideElement = AccessibilityElement(AXUIElementCreateSystemWide())
+  nonisolated(unsafe) static let systemWideElement = AccessibilityElement(AXUIElementCreateSystemWide())
 
   private let underlyingElement: AXUIElement
 

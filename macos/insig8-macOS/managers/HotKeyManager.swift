@@ -13,13 +13,13 @@ final class HotKeyManager {
   public var mainHotKey = HotKey(key: .period, modifiers: [.command])
   private var hotkeys: [HotKey] = []
 
-  static public let shared = HotKeyManager()
+  static public nonisolated(unsafe) let shared = HotKeyManager()
 
   public func setupKeyboardListeners() {
     settingsHotKey.keyDownHandler = {
       Insig8Emitter.sharedInstance.onShow(target: "SETTINGS")
     }
-    mainHotKey.keyDownHandler = PanelManager.shared.toggle
+    mainHotKey.keyDownHandler = PanelManager.shared.toggleFromNonisolated
     NSEvent.addLocalMonitorForEvents(matching: .keyDown) {
       //      36 enter
       //      123 arrow left

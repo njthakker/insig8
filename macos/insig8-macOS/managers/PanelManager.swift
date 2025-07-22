@@ -6,17 +6,17 @@ enum PreferredScreen {
 @objc class PanelManager: NSObject {
   let baseSize = NSSize(width: 700, height: 450)
   public var preferredScreen: PreferredScreen = .frontmost
-  private let mainWindow: Panel = Panel(contentRect: .zero)
+  @MainActor private let mainWindow: Panel = Panel(contentRect: .zero)
   private var rootView: RCTRootView?
 
-  @objc static public let shared = PanelManager()
+  @objc static public nonisolated(unsafe) let shared = PanelManager()
 
-  public func setRootView(rootView: RCTRootView) {
+  @MainActor public func setRootView(rootView: RCTRootView) {
     mainWindow.contentView!.addSubview(rootView)
     self.rootView = rootView
   }
 
-  @objc func showWindow(target: String? = nil) {
+  @MainActor @objc func showWindow(target: String? = nil) {
     if mainWindow.isVisible {
       return
     }
@@ -44,7 +44,7 @@ enum PreferredScreen {
     Insig8Emitter.sharedInstance.onShow(target: nil)
   }
 
-  @objc func hideWindow() {
+  @MainActor @objc func hideWindow() {
     //    #if !DEBUG
     if mainWindow.isVisible {
       //      overlayWindow.orderOut(self)
@@ -55,7 +55,7 @@ enum PreferredScreen {
     //    #endif
   }
 
-  @objc func resetSize() {
+  @MainActor @objc func resetSize() {
     let origin = CGPoint(x: 0, y: 0)
     let size = baseSize
     let frame = NSRect(origin: origin, size: size)
@@ -63,7 +63,7 @@ enum PreferredScreen {
     mainWindow.center()
   }
 
-  @objc func setHeight(_ height: Int) {
+  @MainActor @objc func setHeight(_ height: Int) {
     var finalHeight = height
     if height == 0 {
       finalHeight = Int(baseSize.height)
@@ -89,7 +89,7 @@ enum PreferredScreen {
     self.rootView?.setFrameOrigin(NSPoint(x: 0, y: 0))
   }
 
-  @objc func setRelativeSize(_ proportion: Double) {
+  @MainActor @objc func setRelativeSize(_ proportion: Double) {
     guard let screenSize = NSScreen.main?.frame.size else {
       return
     }
@@ -105,11 +105,18 @@ enum PreferredScreen {
     mainWindow.center()
   }
 
-  func toggle() {
+  @MainActor func toggle() {
     if mainWindow.isVisible {
       hideWindow()
     } else {
       showWindow()
+    }
+  }
+  
+  // Wrapper for nonisolated contexts like hotkeys
+  nonisolated func toggleFromNonisolated() {
+    Task { @MainActor in
+      toggle()
     }
   }
 
@@ -117,11 +124,11 @@ enum PreferredScreen {
     self.preferredScreen = preferredScreen
   }
 
-  func getPreferredScreen() -> NSScreen? {
+  @MainActor func getPreferredScreen() -> NSScreen? {
     return self.preferredScreen == .frontmost ? getFrontmostScreen() : getScreenWithMouse()
   }
 
-  func getFrontmostScreen() -> NSScreen? {
+  @MainActor func getFrontmostScreen() -> NSScreen? {
     mainWindow.center()
     return mainWindow.screen ?? NSScreen.main
   }

@@ -1,5 +1,6 @@
 import Cocoa
 
+@MainActor
 class KeyboardShortcutRecorder {
   private var monitor: Any?
   private var isActive = false

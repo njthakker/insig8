@@ -82,7 +82,9 @@ class BlurViewManager: RCTViewManager {
     return true
   }
 
-  override func view() -> NSView! {
-    return BlurView()
+  nonisolated override func view() -> NSView! {
+    return DispatchQueue.main.sync {
+      return BlurView()
+    }
   }
 }

@@ -14,7 +14,7 @@ struct AppleScriptHelper {
       return nil
     }
 
-    let contentOfFile = try? String(contentsOfFile: scriptFilePath)
+    let contentOfFile = try? String(contentsOfFile: scriptFilePath, encoding: .utf8)
 
     guard let appleScript = contentOfFile else {
       return nil
@@ -41,7 +41,7 @@ struct AppleScriptHelper {
       return nil
     }
 
-    let contentOfFile = try? String(contentsOfFile: scriptFilePath)
+    let contentOfFile = try? String(contentsOfFile: scriptFilePath, encoding: .utf8)
 
     guard let appleScript = contentOfFile else {
       return nil

@@ -47,7 +47,7 @@ class AIBridge: NSObject {
                 threadId: threadId
             )
             
-            let commitment = await aiManager.commitmentTracker?.analyzeMessage(message, context: context)
+            let commitment = await aiManager.analyzeMessage(message, context: context)
             
             await MainActor.run {
                 if let commitment = commitment {
@@ -80,7 +80,7 @@ class AIBridge: NSObject {
         }
         
         Task {
-            await aiManager.commitmentTracker?.updateCommitmentStatus(uuid, status: commitmentStatus)
+            await aiManager.updateCommitmentStatus(uuid, status: commitmentStatus)
             await MainActor.run {
                 resolve(["success": true])
             }
@@ -102,7 +102,7 @@ class AIBridge: NSObject {
         let snoozeDate = Date(timeIntervalSince1970: until / 1000)
         
         Task {
-            await aiManager.commitmentTracker?.snoozeCommitment(uuid, until: snoozeDate)
+            await aiManager.snoozeCommitment(uuid, until: snoozeDate)
             await MainActor.run {
                 resolve(["success": true])
             }
@@ -115,7 +115,7 @@ class AIBridge: NSObject {
     func startMeetingRecording(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         Task {
             do {
-                try await aiManager.meetingProcessor?.startMeetingRecording()
+                try await aiManager.startMeetingRecording()
                 await MainActor.run {
                     resolve(["success": true, "message": "Meeting recording started"])
                 }
@@ -131,7 +131,7 @@ class AIBridge: NSObject {
     func stopMeetingRecording(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         Task {
             do {
-                let meetingSession = try await aiManager.meetingProcessor?.stopMeetingRecording()
+                let meetingSession = try await aiManager.stopMeetingRecording()
                 await MainActor.run {
                     if let meeting = meetingSession {
                         resolve(meetingSessionToDict(meeting))
@@ -153,7 +153,7 @@ class AIBridge: NSObject {
         resolver resolve: @escaping RCTPromiseResolveBlock,
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
-        let meetings = aiManager.meetingProcessor?.getMeetingHistory(limit: limit.intValue) ?? []
+        let meetings = aiManager.getMeetingHistory(limit: limit.intValue)
         let meetingsArray = meetings.map { meetingSessionToDict($0) }
         resolve(meetingsArray)
     }
@@ -168,7 +168,7 @@ class AIBridge: NSObject {
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
         Task {
-            let results = await aiManager.searchEngine?.semanticSearch(query) ?? []
+            let results = await aiManager.semanticSearch(query)
             let limitedResults = Array(results.prefix(limit.intValue))
             
             await MainActor.run {
@@ -186,7 +186,7 @@ class AIBridge: NSObject {
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
         Task {
-            let results = await aiManager.searchEngine?.globalSearch(query, limit: limit.intValue)
+            let results = await aiManager.globalSearch(query, limit: limit.intValue)
             
             await MainActor.run {
                 if let results = results {
@@ -205,7 +205,7 @@ class AIBridge: NSObject {
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
         Task {
-            let commitments = await aiManager.searchEngine?.searchCommitments(query) ?? []
+            let commitments = await aiManager.searchCommitments(query)
             
             await MainActor.run {
                 let commitmentsArray = commitments.map { commitmentToDict($0) }
@@ -221,7 +221,7 @@ class AIBridge: NSObject {
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
         Task {
-            let meetings = await aiManager.searchEngine?.searchMeetings(query) ?? []
+            let meetings = await aiManager.searchMeetings(query)
             
             await MainActor.run {
                 let meetingsArray = meetings.map { meetingSessionToDict($0) }
@@ -237,7 +237,7 @@ class AIBridge: NSObject {
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
         Task {
-            let clipboardItems = await aiManager.searchEngine?.searchClipboardHistory(query) ?? []
+            let clipboardItems = await aiManager.searchClipboardHistory(query)
             
             await MainActor.run {
                 let itemsArray = clipboardItems.map { clipboardItemToDict($0) }
@@ -252,7 +252,7 @@ class AIBridge: NSObject {
     func startScreenMonitoring(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         Task {
             do {
-                try await aiManager.screenMonitor?.startMonitoring()
+                try await aiManager.startScreenMonitoring()
                 await MainActor.run {
                     resolve(["success": true, "message": "Screen monitoring started"])
                 }
@@ -266,14 +266,14 @@ class AIBridge: NSObject {
     
     @objc
     func stopScreenMonitoring(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-        aiManager.screenMonitor?.stopMonitoring()
+        aiManager.stopScreenMonitoring()
         resolve(["success": true, "message": "Screen monitoring stopped"])
     }
     
     @objc
     func getUnrespondedMessages(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
         Task {
-            let unrespondedMessages = await aiManager.screenMonitor?.detectUnrespondedMessages() ?? []
+            let unrespondedMessages = await aiManager.detectUnrespondedMessages()
             
             await MainActor.run {
                 let messagesArray = unrespondedMessages.map { unrespondedMessageToDict($0) }

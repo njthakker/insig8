@@ -2,28 +2,17 @@ import Foundation
 import Vision
 import SwiftData
 import Combine
+import CommonCrypto
+import CoreGraphics
+import ImageIO
+import UniformTypeIdentifiers
 
-// Screen Capture Compatibility - Mock implementation for now
-class SCCaptureEngine {
-    // Empty mock implementation
-}
-
-class SCCaptureStream {
-    // Empty mock implementation  
-}
-
-class SCCaptureScreenshot {
-    let surface: MockSurface = MockSurface()
-}
-
-class MockSurface {
-    let data: Data = Data()
-}
+#if canImport(ScreenCaptureKit)
+import ScreenCaptureKit
+#endif
 
 @Observable
 class ScreenMonitor: ObservableObject {
-    private var captureEngine: SCCaptureEngine?
-    private var stream: SCCaptureStream?
     private let commitmentTracker: CommitmentTracker
     private let vectorDB: VectorDatabase
     private let ocrProcessor: OCRProcessor
@@ -51,9 +40,6 @@ class ScreenMonitor: ObservableObject {
         // Request screen recording permission
         try await requestScreenCapturePermission()
         
-        // Set up capture engine
-        try await setupCaptureEngine()
-        
         // Start periodic screen capture
         startPeriodicCapture()
         
@@ -67,43 +53,39 @@ class ScreenMonitor: ObservableObject {
         captureTimer?.invalidate()
         captureTimer = nil
         
-        Task {
-            await stopCaptureEngine()
-        }
-        
         isMonitoring = false
         print("Screen monitoring stopped")
     }
     
     func captureCurrentScreen() async -> ScreenCapture? {
-        guard let captureEngine = captureEngine else {
-            print("Capture engine not initialized")
-            return nil
-        }
-        
-        do {
-            // Get available displays
-            let availableContent = try await SCShareableContent.current
-            guard let display = availableContent.displays.first else {
-                print("No displays available for capture")
-                return nil
-            }
-            
-            // Create filter for the display
-            let filter = SCContentFilter(display: display, excludingWindows: [])
-            
-            // Configure capture
-            let configuration = SCCaptureConfiguration()
-            configuration.width = Int(display.width)
-            configuration.height = Int(display.height)
-            configuration.pixelFormat = kCVPixelFormatType_32BGRA
-            configuration.showsCursor = false
-            
-            // Capture screenshot
-            let sample = try await captureEngine.captureSingleFrame(contentFilter: filter, configuration: configuration)
+#if canImport(ScreenCaptureKit) && os(macOS)
+        if #available(macOS 12.3, *) {
+            do {
+                // Get available displays
+                let availableContent = try await SCShareableContent.current
+                guard let display = availableContent.displays.first else {
+                    print("No displays available for capture")
+                    return nil
+                }
+                
+                // Create filter for the display
+                let filter = SCContentFilter(display: display, excludingWindows: [])
+                
+                // Configure capture settings
+                let configuration = SCStreamConfiguration()
+                configuration.width = Int(display.width)
+                configuration.height = Int(display.height)
+                configuration.pixelFormat = kCVPixelFormatType_32BGRA
+                configuration.showsCursor = false
+                
+                // Use SCScreenshotManager for single frame capture
+                let screenshot = try await SCScreenshotManager.captureImage(
+                    contentFilter: filter,
+                    configuration: configuration
+                )
             
             // Convert to image data
-            guard let imageData = extractImageData(from: sample) else {
+            guard let imageData = extractImageData(from: screenshot) else {
                 print("Failed to extract image data")
                 return nil
             }
@@ -151,6 +133,14 @@ class ScreenMonitor: ObservableObject {
             print("Failed to capture screen: \(error)")
             return nil
         }
+        } else {
+            print("ScreenCaptureKit not available on this macOS version")
+            return nil
+        }
+#else
+        print("ScreenCaptureKit not available")
+        return nil
+#endif
     }
     
     func detectUnrespondedMessages() async -> [UnrespondedMessage] {
@@ -203,14 +193,6 @@ class ScreenMonitor: ObservableObject {
         return runningApps.contains { $0.bundleIdentifier == Bundle.main.bundleIdentifier }
     }
     
-    private func setupCaptureEngine() async throws {
-        self.captureEngine = SCCaptureEngine()
-    }
-    
-    private func stopCaptureEngine() async {
-        stream = nil
-        captureEngine = nil
-    }
     
     private func startPeriodicCapture() {
         captureTimer = Timer.scheduledTimer(withTimeInterval: captureInterval, repeats: true) { _ in
@@ -220,10 +202,20 @@ class ScreenMonitor: ObservableObject {
         }
     }
     
-    private func extractImageData(from sample: SCCaptureScreenshot) -> Data? {
-        // Convert SCCaptureScreenshot to Data
-        // This is a simplified implementation
-        return sample.surface.data
+    private func extractImageData(from screenshot: CGImage) -> Data? {
+        // Convert CGImage to Data
+        let mutableData = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(mutableData, UTType.png.identifier as CFString, 1, nil) else {
+            return nil
+        }
+        
+        CGImageDestinationAddImage(destination, screenshot, nil)
+        
+        guard CGImageDestinationFinalize(destination) else {
+            return nil
+        }
+        
+        return mutableData as Data
     }
     
     private func getCurrentApplication() -> String {
@@ -292,43 +284,269 @@ class ScreenMonitor: ObservableObject {
     }
 }
 
-// MARK: - OCR Processor
+// MARK: - Enhanced OCR Processor with Advanced Vision Features
 
 class OCRProcessor {
+    @available(macOS 13.0, *)
+    private var documentTextRequest: VNRecognizeTextRequest?
+    private var rectangleDetector: VNDetectRectanglesRequest?
+    
+    init() {
+        setupAdvancedVisionRequests()
+    }
+    
     func extractText(from imageData: Data) async -> String {
         guard let image = NSImage(data: imageData),
               let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
             return ""
         }
         
+        return await performEnhancedOCR(on: cgImage)
+    }
+    
+    func extractDocumentText(from imageData: Data) async -> DocumentOCRResult {
+        guard let image = NSImage(data: imageData),
+              let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return DocumentOCRResult(text: "", confidence: 0.0, layoutInfo: [])
+        }
+        
+        return await performDocumentOCR(on: cgImage)
+    }
+    
+    func detectTextRectangles(from imageData: Data) async -> [TextRectangle] {
+        guard let image = NSImage(data: imageData),
+              let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            return []
+        }
+        
+        return await detectTextRegions(in: cgImage)
+    }
+    
+    // MARK: - Private Enhanced Vision Methods
+    
+    private func setupAdvancedVisionRequests() {
+        // Set up document text recognition for better structured text extraction
+        if #available(macOS 13.0, *) {
+            documentTextRequest = VNRecognizeTextRequest()
+            documentTextRequest?.recognitionLevel = .accurate
+            documentTextRequest?.usesLanguageCorrection = true
+            documentTextRequest?.automaticallyDetectsLanguage = true
+        }
+        
+        // Set up rectangle detection for UI elements
+        rectangleDetector = VNDetectRectanglesRequest()
+        rectangleDetector?.minimumAspectRatio = 0.1
+        rectangleDetector?.maximumAspectRatio = 10.0
+        rectangleDetector?.minimumSize = 0.01
+        rectangleDetector?.maximumObservations = 50
+    }
+    
+    private func performEnhancedOCR(on cgImage: CGImage) async -> String {
         return await withCheckedContinuation { continuation in
-            let request = VNRecognizeTextRequest { request, error in
+            // Use multiple recognition strategies for better accuracy
+            var allText: [String] = []
+            let group = DispatchGroup()
+            
+            // Strategy 1: Standard text recognition
+            group.enter()
+            performStandardTextRecognition(on: cgImage) { text in
+                allText.append(text)
+                group.leave()
+            }
+            
+            // Strategy 2: Document text recognition (macOS 13+)
+            if #available(macOS 13.0, *) {
+                group.enter()
+                performDocumentTextRecognition(on: cgImage) { text in
+                    allText.append(text)
+                    group.leave()
+                }
+            }
+            
+            group.notify(queue: .main) {
+                // Combine results and remove duplicates
+                let combinedText = allText.joined(separator: " ")
+                let cleanedText = self.removeDuplicateText(combinedText)
+                continuation.resume(returning: cleanedText)
+            }
+        }
+    }
+    
+    private func performStandardTextRecognition(on cgImage: CGImage, completion: @escaping (String) -> Void) {
+        let request = VNRecognizeTextRequest { request, error in
+            if let error = error {
+                print("Standard OCR error: \(error)")
+                completion("")
+                return
+            }
+            
+            let recognizedText = request.results?.compactMap { result in
+                guard let observation = result as? VNRecognizedTextObservation else { return nil }
+                return observation.topCandidates(1).first?.string
+            }.joined(separator: " ") ?? ""
+            
+            completion(recognizedText)
+        }
+        
+        request.recognitionLevel = .accurate
+        request.usesLanguageCorrection = true
+        
+        // Enhanced recognition options
+        request.recognitionLanguages = ["en-US", "en-GB"] // Add more as needed
+        request.customWords = ["Slack", "Teams", "Discord", "Zoom"] // App-specific vocabulary
+        
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        
+        do {
+            try handler.perform([request])
+        } catch {
+            print("Failed to perform standard OCR: \(error)")
+            completion("")
+        }
+    }
+    
+    @available(macOS 13.0, *)
+    private func performDocumentTextRecognition(on cgImage: CGImage, completion: @escaping (String) -> Void) {
+        guard let documentRequest = documentTextRequest else {
+            completion("")
+            return
+        }
+        
+        let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+        
+        do {
+            try handler.perform([documentRequest])
+            
+            let recognizedText = documentRequest.results?.compactMap { result in
+                guard let observation = result as? VNRecognizedTextObservation else { return nil }
+                return observation.topCandidates(1).first?.string
+            }.joined(separator: " ") ?? ""
+            
+            completion(recognizedText)
+        } catch {
+            print("Failed to perform document OCR: \(error)")
+            completion("")
+        }
+    }
+    
+    private func performDocumentOCR(on cgImage: CGImage) async -> DocumentOCRResult {
+        return await withCheckedContinuation { continuation in
+            guard #available(macOS 13.0, *),
+                  let documentRequest = documentTextRequest else {
+                continuation.resume(returning: DocumentOCRResult(text: "", confidence: 0.0, layoutInfo: []))
+                return
+            }
+            
+            documentRequest.completionHandler = { request, error in
                 if let error = error {
-                    print("OCR error: \(error)")
-                    continuation.resume(returning: "")
+                    print("Document OCR error: \(error)")
+                    continuation.resume(returning: DocumentOCRResult(text: "", confidence: 0.0, layoutInfo: []))
                     return
                 }
                 
-                let recognizedText = request.results?.compactMap { result in
-                    (result as? VNRecognizedTextObservation)?.topCandidates(1).first?.string
-                }.joined(separator: " ") ?? ""
+                var layoutInfo: [TextLayoutInfo] = []
+                var allText: [String] = []
+                var totalConfidence: Float = 0.0
+                var observationCount = 0
                 
-                continuation.resume(returning: recognizedText)
+                for result in request.results ?? [] {
+                    guard let observation = result as? VNRecognizedTextObservation else { continue }
+                    
+                    if let topCandidate = observation.topCandidates(1).first {
+                        allText.append(topCandidate.string)
+                        totalConfidence += topCandidate.confidence
+                        observationCount += 1
+                        
+                        let layoutElement = TextLayoutInfo(
+                            text: topCandidate.string,
+                            boundingBox: observation.boundingBox,
+                            confidence: topCandidate.confidence
+                        )
+                        layoutInfo.append(layoutElement)
+                    }
+                }
+                
+                let averageConfidence = observationCount > 0 ? totalConfidence / Float(observationCount) : 0.0
+                let combinedText = allText.joined(separator: " ")
+                
+                let result = DocumentOCRResult(
+                    text: combinedText,
+                    confidence: averageConfidence,
+                    layoutInfo: layoutInfo
+                )
+                
+                continuation.resume(returning: result)
             }
             
-            request.recognitionLevel = .accurate
-            request.usesLanguageCorrection = true
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            
+            do {
+                try handler.perform([documentRequest])
+            } catch {
+                print("Failed to perform document OCR: \(error)")
+                continuation.resume(returning: DocumentOCRResult(text: "", confidence: 0.0, layoutInfo: []))
+            }
+        }
+    }
+    
+    private func detectTextRegions(in cgImage: CGImage) async -> [TextRectangle] {
+        return await withCheckedContinuation { continuation in
+            let request = VNDetectTextRectanglesRequest { request, error in
+                if let error = error {
+                    print("Text rectangle detection error: \(error)")
+                    continuation.resume(returning: [])
+                    return
+                }
+                
+                let rectangles = request.results?.compactMap { result in
+                    guard let observation = result as? VNTextObservation else { return nil }
+                    
+                    return TextRectangle(
+                        boundingBox: observation.boundingBox,
+                        confidence: observation.confidence
+                    )
+                } ?? []
+                
+                continuation.resume(returning: rectangles)
+            }
+            
+            request.reportCharacterBoxes = true
             
             let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
             
             do {
                 try handler.perform([request])
             } catch {
-                print("Failed to perform OCR: \(error)")
-                continuation.resume(returning: "")
+                print("Failed to detect text rectangles: \(error)")
+                continuation.resume(returning: [])
             }
         }
     }
+    
+    private func removeDuplicateText(_ text: String) -> String {
+        let words = text.components(separatedBy: .whitespacesAndNewlines)
+        let uniqueWords = Array(Set(words))
+        return uniqueWords.joined(separator: " ")
+    }
+}
+
+// MARK: - Enhanced OCR Types
+
+struct DocumentOCRResult {
+    let text: String
+    let confidence: Float
+    let layoutInfo: [TextLayoutInfo]
+}
+
+struct TextLayoutInfo {
+    let text: String
+    let boundingBox: CGRect
+    let confidence: Float
+}
+
+struct TextRectangle {
+    let boundingBox: CGRect
+    let confidence: Float
 }
 
 // MARK: - Context Analyzer
@@ -507,4 +725,3 @@ extension Data {
     }
 }
 
-import CommonCrypto

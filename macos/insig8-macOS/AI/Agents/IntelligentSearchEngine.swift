@@ -2,38 +2,10 @@ import Foundation
 import SwiftData
 import Combine
 
-// AI Compatibility - Mock implementation for now
-class AILanguageModelSession {
-    func respond(to prompt: String) async throws -> AIResponse {
-        throw AIError.serviceOffline
-    }
-}
-
-struct AIResponse {
-    let content: String
-}
-
-enum AIError: Error {
-    case serviceOffline
-    case modelNotAvailable
-    case processingFailed
-    
-    var localizedDescription: String {
-        switch self {
-        case .serviceOffline:
-            return "On device agent offline"
-        case .modelNotAvailable:
-            return "AI model not available"
-        case .processingFailed:
-            return "AI processing failed"
-        }
-    }
-}
-
 @Observable
 class IntelligentSearchEngine: ObservableObject {
     private let vectorDB: VectorDatabase
-    private let model: AILanguageModelSession
+    private let model: AILanguageModelSession?
     private let modelContainer: ModelContainer
     private let clipboardManager: ClipboardHistoryManager
     private let browserHistoryReader: BrowserHistoryReader
@@ -60,7 +32,7 @@ class IntelligentSearchEngine: ObservableObject {
     User query: 
     """
     
-    init(vectorDB: VectorDatabase, model: AILanguageModelSession, container: ModelContainer) {
+    init(vectorDB: VectorDatabase, model: AILanguageModelSession?, container: ModelContainer) {
         self.vectorDB = vectorDB
         self.model = model
         self.modelContainer = container
@@ -226,9 +198,10 @@ class IntelligentSearchEngine: ObservableObject {
     private func enhanceSearchQuery(_ query: String) async -> EnhancedSearchQuery {
         do {
             let prompt = searchEnhancementPrompt + query
-            let response = try await model.respond(to: prompt)
+            let response = try await model?.respond(to: prompt)
             
-            if let enhancedQuery = parseSearchEnhancementResponse(response.content) {
+            if let response = response,
+               let enhancedQuery = parseSearchEnhancementResponse(response.content) {
                 return enhancedQuery
             }
         } catch {
@@ -279,7 +252,7 @@ class IntelligentSearchEngine: ObservableObject {
         let text: String
         
         if let commitment = item as? Commitment {
-            text = commitment.description
+            text = commitment.commitmentText
         } else if let meeting = item as? MeetingSession {
             text = meeting.summary.isEmpty ? meeting.transcript : meeting.summary
         } else if let clipboardItem = item as? ClipboardItem {
