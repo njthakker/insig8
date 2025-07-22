@@ -6,7 +6,53 @@ import Speech
 import NaturalLanguage
 import CoreML
 
-// AI Compatibility - Mock implementation for now
+// Foundation Models Integration (Swift 6.2 + macOS 26)
+#if canImport(FoundationModels)
+import FoundationModels
+
+// Real Foundation Models implementation
+@available(macOS 26.0, *)
+class AILanguageModelSession {
+    private let languageModel: LanguageModelSession
+    
+    init() async throws {
+        // Initialize Apple's on-device language model
+        self.languageModel = try await LanguageModelSession()
+    }
+    
+    func respond(to prompt: String) async throws -> AIResponse {
+        do {
+            let response = try await languageModel.response(for: .init(prompt))
+            return AIResponse(content: response.content)
+        } catch {
+            throw AIError.processingFailed
+        }
+    }
+}
+
+struct AIResponse {
+    let content: String
+}
+
+enum AIError: Error {
+    case serviceOffline
+    case modelNotAvailable  
+    case processingFailed
+    
+    var localizedDescription: String {
+        switch self {
+        case .serviceOffline:
+            return "On device agent offline"
+        case .modelNotAvailable:
+            return "AI model not available"
+        case .processingFailed:
+            return "AI processing failed"
+        }
+    }
+}
+
+#else
+// Fallback for when Foundation Models not available
 class AILanguageModelSession {
     func respond(to prompt: String) async throws -> AIResponse {
         throw AIError.serviceOffline
@@ -33,6 +79,7 @@ enum AIError: Error {
         }
     }
 }
+#endif
 
 @Observable
 class AIAgentManager: ObservableObject {
@@ -86,21 +133,24 @@ class AIAgentManager: ObservableObject {
     }
     
     private func setupFoundationModel() async throws {
-        if AICapabilities.isFoundationModelsAvailable {
-            #if canImport(FoundationModels)
+        #if canImport(FoundationModels)
+        if #available(macOS 26.0, *) {
             do {
-                self.foundationModel = try await LanguageModelSession()
-                print("Foundation Models initialized successfully")
+                self.foundationModel = try await AILanguageModelSession()
+                print("✅ Foundation Models initialized successfully (Swift 6.2 + macOS 26)")
             } catch {
-                print("Failed to initialize Foundation Models: \(error)")
-                print("Falling back to mock AI processor")
-                self.foundationModel = MockLanguageModelSession()
+                print("⚠️ Failed to initialize Foundation Models: \(error)")
+                print("ℹ️ AI features will show 'On device agent offline'")
+                self.foundationModel = nil
             }
-            #endif
         } else {
-            print("Foundation Models not available, using fallback AI processor")
-            self.foundationModel = MockLanguageModelSession()
+            print("ℹ️ Foundation Models requires macOS 26+")
+            self.foundationModel = nil
         }
+        #else
+        print("ℹ️ Foundation Models not available - AI features will show 'On device agent offline'")
+        self.foundationModel = nil
+        #endif
     }
     
     private func initializeAgents() async throws {

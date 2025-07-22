@@ -1,6 +1,6 @@
 import Foundation
 import HotKey
-import LaunchAtLogin
+// import LaunchAtLogin  // Temporarily removed due to Xcode beta package resolution issues
 
 #if canImport(React)
 import React
@@ -247,9 +247,11 @@ class Insig8Native: RCTEventEmitter {
   }
 
   @objc func setLaunchAtLogin(_ enabled: Bool) {
-    if LaunchAtLogin.isEnabled != enabled {
-      LaunchAtLogin.isEnabled = enabled
-    }
+    // TODO: Re-enable LaunchAtLogin when Xcode beta package resolution is fixed
+    // if LaunchAtLogin.isEnabled != enabled {
+    //   LaunchAtLogin.isEnabled = enabled
+    // }
+    print("LaunchAtLogin temporarily disabled due to Xcode beta issues")
   }
 
   @objc func resizeFrontmostTopHalf() {
