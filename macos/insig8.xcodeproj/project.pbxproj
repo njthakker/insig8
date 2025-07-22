@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		18BB6CB52E2EBF3A00CD709F /* FoundationModels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18BB6CB42E2EBF3A00CD709F /* FoundationModels.framework */; };
+		18BB6CB52E2EBF3A00CD709F /* FoundationModels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18BB6CB42E2EBF3A00CD709F /* FoundationModels.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		323632356636613262623962 /* AIBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356632393937366139313362 /* AIBridge.swift */; };
 		346630363138303738303564 /* IntelligentSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376337636265643237356230 /* IntelligentSearchEngine.swift */; };
 		353466343036366330633732 /* ScreenMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633163303535386635383265 /* ScreenMonitor.swift */; };
@@ -720,7 +720,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -759,7 +759,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MARKETING_VERSION = 1.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -833,7 +833,7 @@
 					"$(inherited)",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = "$(inherited)";
@@ -898,7 +898,7 @@
 					"$(inherited)",
 				);
 				LIBRARY_SEARCH_PATHS = "$(SDKROOT)/usr/lib/swift\"$(inherited)\"";
-				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";

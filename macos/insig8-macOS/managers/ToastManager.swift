@@ -1,7 +1,8 @@
+@MainActor
 class ToastManager {
   private var toastWindow: Toast = Toast(contentRect: .zero)
 
-  static public let shared = ToastManager()
+  @MainActor static public let shared = ToastManager()
 
   func showToast(
     _ text: String, variant: String, timeout: NSNumber?, image: NSImage?

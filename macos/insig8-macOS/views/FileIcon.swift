@@ -1,5 +1,6 @@
 import Cocoa
 
+@MainActor
 class FileIcon: NSView {
   let image = NSImageView()
   @objc var url: NSString = "" {
@@ -26,6 +27,7 @@ class FileIcon: NSView {
   }
 }
 
+@MainActor
 @objc(FileIconManager)
 class FileIconManager: RCTViewManager {
 

@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 final class Toast: NSPanel, NSWindowDelegate {
   init(contentRect: NSRect) {
     super.init(

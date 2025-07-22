@@ -1,5 +1,6 @@
 import Cocoa
 
+@MainActor
 class KeyboardShortcutRecorderView: NSView {
   private let textField = NSTextField(labelWithString: "Click to record shortcut")
   private var isRecording = false
@@ -58,6 +59,7 @@ class KeyboardShortcutRecorderView: NSView {
 
 }
 
+@MainActor
 @objc(KeyboardShortcutRecorderViewManager)
 class KeyboardShortcutRecorderViewManager: RCTViewManager {
 

@@ -1,7 +1,8 @@
 import Foundation
 
+@MainActor
 class ClipboardHelper {
-  static var frontmostApp: (name: String, bundle: String)?
+  @MainActor static var frontmostApp: (name: String, bundle: String)?
 
   static func addOnCopyListener(
     _ callback: @escaping (_ pasteboard: NSPasteboard, _ app: (name: String, bundle: String)?) ->
@@ -17,7 +18,9 @@ class ClipboardHelper {
     // TODO find if there is any better way to observe for changes other than continously check if the amount of items has changed
     Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
       if pasteboard.changeCount != changeCount {
-        callback(pasteboard, self.frontmostApp)
+        Task { @MainActor in
+          callback(pasteboard, self.frontmostApp)
+        }
         changeCount = pasteboard.changeCount
       }
     }
