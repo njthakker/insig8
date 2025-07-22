@@ -73,6 +73,9 @@ public enum AIError: LocalizedError {
     case processingFailed(String)
     case initializationFailed(String)
     case modelNotAvailable
+    case modelUnavailable
+    case notAvailable
+    case unsupportedVersion
     case dependenciesNotInitialized
     case unsupportedOS
     case permissionDenied(String)
@@ -90,6 +93,12 @@ public enum AIError: LocalizedError {
             return "Failed to initialize AI model: \(reason)"
         case .modelNotAvailable:
             return "AI model not available"
+        case .modelUnavailable:
+            return "AI model is unavailable"
+        case .notAvailable:
+            return "Feature not available"
+        case .unsupportedVersion:
+            return "Unsupported version"
         case .dependenciesNotInitialized:
             return "AI dependencies not properly initialized"
         case .unsupportedOS:

@@ -153,9 +153,11 @@ class AIBridge: NSObject {
         resolver resolve: @escaping RCTPromiseResolveBlock,
         rejecter reject: @escaping RCTPromiseRejectBlock
     ) {
-        let meetings = aiManager.getMeetingHistory(limit: limit.intValue)
-        let meetingsArray = meetings.map { meetingSessionToDict($0) }
-        resolve(meetingsArray)
+        Task {
+            let meetings = await aiManager.getMeetingHistory(limit: limit.intValue)
+            let meetingsArray = meetings.map { meetingSessionToDict($0) }
+            resolve(meetingsArray)
+        }
     }
     
     // MARK: - Search Functionality
@@ -266,8 +268,10 @@ class AIBridge: NSObject {
     
     @objc
     func stopScreenMonitoring(_ resolve: @escaping RCTPromiseResolveBlock, rejecter reject: @escaping RCTPromiseRejectBlock) {
-        aiManager.stopScreenMonitoring()
-        resolve(["success": true, "message": "Screen monitoring stopped"])
+        Task {
+            await aiManager.stopScreenMonitoring()
+            resolve(["success": true, "message": "Screen monitoring stopped"])
+        }
     }
     
     @objc

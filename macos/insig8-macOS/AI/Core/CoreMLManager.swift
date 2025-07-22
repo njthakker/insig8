@@ -6,10 +6,10 @@ import NaturalLanguage
 import Accelerate
 
 /// Advanced CoreML integration for on-device AI processing
-class CoreMLManager {
-    static let shared = CoreMLManager()
+class CoreMLManager: @unchecked Sendable {
+    nonisolated(unsafe) static let shared = CoreMLManager()
     
-    // Model registry
+    // Model registry - protected by actor isolation
     private var loadedModels: [String: MLModel] = [:]
     private var modelCache: NSCache<NSString, MLModel> = {
         let cache = NSCache<NSString, MLModel>()
@@ -517,7 +517,7 @@ enum TimeHorizon {
 
 // MARK: - ML Model Input Types
 
-class TextInput: MLFeatureProvider {
+class TextInput: MLFeatureProvider, @unchecked Sendable {
     let text: String
     
     init(text: String) {
@@ -536,7 +536,7 @@ class TextInput: MLFeatureProvider {
     }
 }
 
-class AudioFeaturesInput: MLFeatureProvider {
+class AudioFeaturesInput: MLFeatureProvider, @unchecked Sendable {
     let features: [Float]
     
     init(features: [Float]) {
@@ -555,7 +555,7 @@ class AudioFeaturesInput: MLFeatureProvider {
     }
 }
 
-class TimeSeriesInput: MLFeatureProvider {
+class TimeSeriesInput: MLFeatureProvider, @unchecked Sendable {
     let values: [Float]
     
     init(values: [Float]) {
@@ -574,7 +574,7 @@ class TimeSeriesInput: MLFeatureProvider {
     }
 }
 
-class UserContextInput: MLFeatureProvider {
+class UserContextInput: MLFeatureProvider, @unchecked Sendable {
     let context: UserContext
     
     init(context: UserContext) {

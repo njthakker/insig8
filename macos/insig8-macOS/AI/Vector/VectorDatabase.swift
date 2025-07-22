@@ -3,6 +3,15 @@ import SwiftData
 import NaturalLanguage
 import Accelerate
 
+// MARK: - Error Types
+
+enum VectorDatabaseError: Error {
+    case unsupportedItemType
+    case embeddingGenerationFailed
+    case storageError(String)
+    case searchError(String)
+}
+
 class VectorDatabase {
     private let modelContainer: ModelContainer
     private let embeddingGenerator: EmbeddingGenerator
@@ -21,41 +30,36 @@ class VectorDatabase {
     
     // MARK: - Storage Operations
     
-    func store<T: VectorStorable>(_ item: T) async throws {
-        let context = ModelContext(modelContainer)
-        
-        // Create a mutable copy to work with
-        var mutableItem = item
-        
+    func store<T: VectorStorable>(_ item: inout T) async throws {
         // Generate embedding if not present
-        if mutableItem.embedding.isEmpty {
-            let embedding = await mutableItem.generateEmbedding()
-            mutableItem.embedding = embedding
+        if item.embedding.isEmpty {
+            let embedding = await item.generateEmbedding()
+            item.embedding = embedding
         }
         
-        // Handle specific model types
-        if let commitment = mutableItem as? Commitment {
-            context.insert(commitment)
+        // Use appropriate ModelActor for thread-safe storage
+        switch item {
+        case let commitment as Commitment:
+            let actor = CommitmentActor(modelContainer: modelContainer)
+            await actor.saveCommitment(commitment)
+        case let screenCapture as ScreenCapture:
+            let actor = ScreenCaptureActor(modelContainer: modelContainer)
+            await actor.saveScreenCapture(screenCapture)
+        case let clipboardItem as ClipboardItem:
+            let actor = ClipboardItemActor(modelContainer: modelContainer)
+            await actor.saveClipboardItem(clipboardItem)
+        case let meetingSession as MeetingSession:
+            let actor = MeetingSessionActor(modelContainer: modelContainer)
+            await actor.saveMeetingSession(meetingSession)
+        default:
+            throw VectorDatabaseError.unsupportedItemType
         }
-        try context.save()
     }
     
     func storeBatch<T: VectorStorable>(_ items: [T]) async throws {
-        let context = ModelContext(modelContainer)
-        
-        for item in items {
-            var mutableItem = item
-            if mutableItem.embedding.isEmpty {
-                let embedding = await mutableItem.generateEmbedding()
-                mutableItem.embedding = embedding
-            }
-            // Handle specific model types
-            if let commitment = mutableItem as? Commitment {
-                context.insert(commitment)
-            }
+        for var item in items {
+            try await store(&item)
         }
-        
-        try context.save()
     }
     
     // MARK: - Search Operations
@@ -145,7 +149,7 @@ class VectorDatabase {
                     metadata: [
                         "recipient": commitment.recipient,
                         "status": commitment.status.rawValue,
-                        "priority": commitment.priority.rawValue
+                        "priority": String(commitment.priority.rawValue)
                     ],
                     type: .commitment
                 )
@@ -172,8 +176,8 @@ class VectorDatabase {
                     content: meeting.summary.isEmpty ? meeting.transcript : meeting.summary,
                     metadata: [
                         "title": meeting.title,
-                        "participants": meeting.participants,
-                        "startTime": meeting.startTime
+                        "participants": meeting.participants.joined(separator: ", "),
+                        "startTime": meeting.startTime.ISO8601Format()
                     ],
                     type: .meeting
                 )
@@ -201,7 +205,7 @@ class VectorDatabase {
                     metadata: [
                         "contentType": item.contentType.rawValue,
                         "sourceApp": item.sourceApp ?? "Unknown",
-                        "timestamp": item.timestamp
+                        "timestamp": item.timestamp.ISO8601Format()
                     ],
                     type: .clipboardItem
                 )
@@ -228,7 +232,7 @@ class VectorDatabase {
                     content: capture.extractedText,
                     metadata: [
                         "detectedApp": capture.detectedApp,
-                        "timestamp": capture.timestamp
+                        "timestamp": capture.timestamp.ISO8601Format()
                     ],
                     type: .screenCapture
                 )

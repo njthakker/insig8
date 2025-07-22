@@ -304,7 +304,7 @@ class IntelligentSearchEngine: ObservableObject {
             timestamp: browserItem.visitTime,
             metadata: [
                 "url": browserItem.url,
-                "visitCount": browserItem.visitCount
+                "visitCount": String(browserItem.visitCount)
             ]
         )
     }
@@ -338,7 +338,7 @@ class IntelligentSearchEngine: ObservableObject {
 
 // MARK: - Clipboard History Manager
 
-class ClipboardHistoryManager {
+class ClipboardHistoryManager: @unchecked Sendable {
     private let modelContainer: ModelContainer
     private var isMonitoring = false
     private let pasteboard = NSPasteboard.general

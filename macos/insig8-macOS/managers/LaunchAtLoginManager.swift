@@ -4,8 +4,8 @@ import ServiceManagement
 /// Native launch-at-login manager using ServiceManagement framework
 /// Replaces third-party LaunchAtLogin package for better compatibility
 @available(macOS 13.0, *)
-class LaunchAtLoginManager {
-    static let shared = LaunchAtLoginManager()
+class LaunchAtLoginManager: @unchecked Sendable {
+    nonisolated(unsafe) static let shared = LaunchAtLoginManager()
     
     private let service = SMAppService.mainApp
     private let bundleId = Bundle.main.bundleIdentifier ?? "com.insig8.macos"
@@ -67,8 +67,8 @@ class LaunchAtLoginManager {
 }
 
 /// Fallback implementation for macOS versions < 13.0
-class LaunchAtLoginManagerLegacy {
-    static let shared = LaunchAtLoginManagerLegacy()
+class LaunchAtLoginManagerLegacy: @unchecked Sendable {
+    nonisolated(unsafe) static let shared = LaunchAtLoginManagerLegacy()
     
     private let bundleId = Bundle.main.bundleIdentifier ?? "com.insig8.macos"
     private let loginItemsKey = "com.apple.loginitems.plist"
@@ -91,7 +91,7 @@ class LaunchAtLoginManagerLegacy {
         
         for item in loginItemsArrayRef {
             if let itemURL = LSSharedFileListItemCopyResolvedURL(item, 0, nil)?.takeRetainedValue() {
-                if itemURL.absoluteString == bundleURL.absoluteString {
+                if (itemURL as URL).absoluteString == bundleURL.absoluteString {
                     return true
                 }
             }
@@ -120,7 +120,7 @@ class LaunchAtLoginManagerLegacy {
                 kLSSharedFileListItemLast.takeRetainedValue(),
                 nil,
                 nil,
-                bundleURL,
+                bundleURL as CFURL,
                 nil,
                 nil
             )
@@ -141,7 +141,7 @@ class LaunchAtLoginManagerLegacy {
             
             for item in loginItemsArrayRef {
                 if let itemURL = LSSharedFileListItemCopyResolvedURL(item, 0, nil)?.takeRetainedValue() {
-                    if itemURL.absoluteString == bundleURL.absoluteString {
+                    if (itemURL as URL).absoluteString == bundleURL.absoluteString {
                         let result = LSSharedFileListItemRemove(loginItemsRef, item)
                         if result == noErr {
                             print("✅ Launch at login disabled successfully (legacy)")
@@ -161,8 +161,8 @@ class LaunchAtLoginManagerLegacy {
 }
 
 /// Unified interface that works across macOS versions
-class LaunchAtLoginHelper {
-    static let shared = LaunchAtLoginHelper()
+class LaunchAtLoginHelper: @unchecked Sendable {
+    nonisolated(unsafe) static let shared = LaunchAtLoginHelper()
     
     private init() {}
     

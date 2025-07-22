@@ -46,7 +46,7 @@ class UserPreferences {
 // MARK: - Commitment Models
 
 @Model
-class Commitment: VectorStorable {
+class Commitment: @unchecked Sendable, VectorStorable {
     var id: UUID
     var commitmentText: String
     var source: CommitmentSource
@@ -102,7 +102,7 @@ class Commitment: VectorStorable {
 // MARK: - Meeting Models
 
 @Model
-class MeetingSession: VectorStorable {
+class MeetingSession: @unchecked Sendable, VectorStorable {
     var id: UUID
     var title: String
     var startTime: Date
@@ -183,7 +183,7 @@ class ActionItem {
 // MARK: - Clipboard and Screen Models
 
 @Model
-class ClipboardItem: VectorStorable {
+class ClipboardItem: @unchecked Sendable, VectorStorable {
     var id: UUID
     var content: String
     var contentType: ClipboardContentType
@@ -212,7 +212,7 @@ class ClipboardItem: VectorStorable {
 }
 
 @Model
-class ScreenCapture: VectorStorable {
+class ScreenCapture: @unchecked Sendable, VectorStorable {
     var id: UUID
     var timestamp: Date
     var imageData: Data
@@ -370,29 +370,42 @@ struct AudioRecording: Codable {
 
 // MARK: - Vector Storage Protocol
 
-protocol VectorStorable {
+protocol VectorStorable: Sendable {
     var embedding: [Float] { get set }
     func generateEmbedding() async -> [Float]
 }
 
 // MARK: - Search Result Types
 
-struct VectorSearchResult {
+struct VectorSearchResult: Sendable, Hashable {
     let id: UUID
     let similarity: Float
     let content: String
-    let metadata: [String: Any]
+    let metadata: [String: String] // Changed from [String: Any] to make Sendable
     let type: ContextType
+    
+    // Hashable conformance
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+        hasher.combine(similarity)
+        hasher.combine(content)
+        hasher.combine(type)
+    }
+    
+    // Equatable conformance (required for Hashable)
+    static func == (lhs: VectorSearchResult, rhs: VectorSearchResult) -> Bool {
+        return lhs.id == rhs.id && lhs.similarity == rhs.similarity && lhs.content == rhs.content
+    }
 }
 
-struct SearchResult {
+struct SearchResult: Sendable {
     let id: UUID
     let title: String
     let content: String
     let type: ContextType
     let relevanceScore: Double
     let timestamp: Date
-    let metadata: [String: Any]
+    let metadata: [String: String]
 }
 
 struct RelatedItem {

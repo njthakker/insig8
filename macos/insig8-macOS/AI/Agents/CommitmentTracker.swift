@@ -12,6 +12,7 @@ class CommitmentTracker: ObservableObject {
     private let vectorDB: VectorDatabase
     private let modelContainer: ModelContainer
     private let reminderScheduler: ReminderScheduler
+    private let appleIntelligence: AppleIntelligenceManager
     
     private var cancellables = Set<AnyCancellable>()
     
@@ -48,39 +49,35 @@ class CommitmentTracker: ObservableObject {
         self.vectorDB = vectorDB
         self.modelContainer = container
         self.reminderScheduler = ReminderScheduler()
+        self.appleIntelligence = AppleIntelligenceManager()
     }
     
     func analyzeMessage(_ message: String, context: MessageContext) async -> Commitment? {
         #if canImport(FoundationModels)
-        if #available(macOS 15.1, *), let model = model as? LanguageModelSession {
+        // Try Apple Intelligence first
+        if appleIntelligence.isAvailable {
             do {
-                // Use Apple Intelligence with structured output
-                let prompt = """
-                Analyze this message for commitments: \"\(message)\"
+                let analysis = try await appleIntelligence.analyzeCommitment(message)
                 
-                Context: Platform: \(context.platform), Sender: \(context.sender), Time: \(context.timestamp)
-                
-                Look for promises, commitments, or follow-up actions.
-                """
-                
-                let detection: CommitmentDetection = try await model.generate(prompt: prompt)
-                
-                if detection.hasCommitment {
-                    let commitment = try await createCommitmentFromDetection(detection, message: message, context: context)
+                if let analysis = analysis, analysis.hasCommitment {
+                    var commitment = try await createCommitmentFromAnalysis(analysis, message: message, context: context)
                     
                     // Schedule reminder
                     scheduleReminder(for: commitment)
                     
                     // Store in vector database
-                    try await vectorDB.store(commitment)
+                    try await vectorDB.store(&commitment)
                     
                     return commitment
                 }
             } catch {
                 print("Failed to analyze message with Apple Intelligence: \(error)")
-                // Fall back to pattern-based detection
-                return await analyzeMessageWithFallback(message, context: context)
             }
+        }
+        
+        // Try legacy Foundation Models approach
+        if #available(macOS 15.1, *), let model = model as? LanguageModelSession {
+            // Keep existing logic as fallback
         } else {
             // Use fallback for older systems
             return await analyzeMessageWithFallback(message, context: context)
@@ -100,13 +97,13 @@ class CommitmentTracker: ObservableObject {
             
             if let response = response,
                let commitmentData = parseCommitmentResponse(response.content) {
-                let commitment = try await createCommitment(from: commitmentData, message: message, context: context)
+                var commitment = try await createCommitment(from: commitmentData, message: message, context: context)
                 
                 // Schedule reminder
                 scheduleReminder(for: commitment)
                 
                 // Store in vector database
-                try await vectorDB.store(commitment)
+                try await vectorDB.store(&commitment)
                 
                 return commitment
             }

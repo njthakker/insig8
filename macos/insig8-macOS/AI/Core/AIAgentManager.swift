@@ -12,8 +12,7 @@ import FoundationModels
 #endif
 
 @Observable
-@MainActor
-class AIAgentManager: ObservableObject {
+class AIAgentManager: @unchecked Sendable, ObservableObject {
     private var foundationModel: AILanguageModelSession?
     private var commitmentTracker: CommitmentTracker?
     private var meetingProcessor: MeetingProcessor?
@@ -28,10 +27,14 @@ class AIAgentManager: ObservableObject {
     private let maxMemoryUsage: Int = 500_000_000 // 500MB
     private let peakMemoryUsage: Int = 2_000_000_000 // 2GB
     
-    static let shared = AIAgentManager()
+    nonisolated(unsafe) static let shared = AIAgentManager()
+    
+    @MainActor
+    private var _isInitialized = false
     
     private init() {}
     
+    @MainActor
     func initialize() async throws {
         try await setupModelContainer()
         try await setupFoundationModel()
@@ -186,8 +189,8 @@ class AIAgentManager: ObservableObject {
         return try await meetingProcessor?.stopMeetingRecording()
     }
     
-    func getMeetingHistory(limit: Int) -> [MeetingSession] {
-        return meetingProcessor?.getMeetingHistory(limit: limit) ?? []
+    func getMeetingHistory(limit: Int) async -> [MeetingSession] {
+        return await meetingProcessor?.getMeetingHistory(limit: limit) ?? []
     }
     
     // Search Engine Interface
@@ -216,16 +219,16 @@ class AIAgentManager: ObservableObject {
         try await screenMonitor?.startMonitoring()
     }
     
-    func stopScreenMonitoring() {
-        screenMonitor?.stopMonitoring()
+    func stopScreenMonitoring() async {
+        await screenMonitor?.stopMonitoring()
     }
     
     func detectUnrespondedMessages() async -> [UnrespondedMessage] {
         return await screenMonitor?.detectUnrespondedMessages() ?? []
     }
     
-    func shutdown() {
-        screenMonitor?.stopMonitoring()
+    func shutdown() async {
+        await screenMonitor?.stopMonitoring()
         cancellables.removeAll()
     }
 }

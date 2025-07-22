@@ -8,19 +8,20 @@
 
 /* Begin PBXBuildFile section */
 		12135FE81829671B883665B9 /* libPods-macOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E8AB4A585CFBE2A331F47C09 /* libPods-macOS.a */; };
-		323632356636613262623962 /* AIBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356632393937366139313362 /* AIBridge.swift */; };
-		346630363138303738303564 /* IntelligentSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376337636265643237356230 /* IntelligentSearchEngine.swift */; };
-		353466343036366330633732 /* ScreenMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633163303535386635383265 /* ScreenMonitor.swift */; };
-		393939656339336565653635 /* AIDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646663613734396435303763 /* AIDataModels.swift */; };
-		396266343831373861343535 /* CommitmentTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633433336163326665653830 /* CommitmentTracker.swift */; };
-		4645E6FFD6854016AD2531D8 /* EnhancedTextProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B925397C744F90B879232C /* EnhancedTextProcessor.swift */; };
+		180333052E30219100ED2305 /* FoundationModels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18BB6CB42E2EBF3A00CD709F /* FoundationModels.framework */; };
+		323632356636613262623962 /* Bridge/AIBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356632393937366139313362 /* Bridge/AIBridge.swift */; };
+		346630363138303738303564 /* Agents/IntelligentSearchEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376337636265643237356230 /* Agents/IntelligentSearchEngine.swift */; };
+		353466343036366330633732 /* Agents/ScreenMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633163303535386635383265 /* Agents/ScreenMonitor.swift */; };
+		393939656339336565653635 /* Data/AIDataModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646663613734396435303763 /* Data/AIDataModels.swift */; };
+		396266343831373861343535 /* Agents/CommitmentTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 633433336163326665653830 /* Agents/CommitmentTracker.swift */; };
+		4645E6FFD6854016AD2531D8 /* Core/EnhancedTextProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F7B925397C744F90B879232C /* Core/EnhancedTextProcessor.swift */; };
 		514201522437B4B40078DB4F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 514201512437B4B40078DB4F /* Assets.xcassets */; };
 		514201552437B4B40078DB4F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 514201532437B4B40078DB4F /* Main.storyboard */; };
-		598C03EDE14C4D0598FDF8D8 /* AISharedTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5213402D496D46EE866DE9B1 /* AISharedTypes.swift */; };
-		613061306634616132363537 /* VectorDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373730663931643135393536 /* VectorDatabase.swift */; };
-		613739393561336339363861 /* AIBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 353038313561353936306139 /* AIBridge.m */; };
-		643031653433653630343663 /* AIAgentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613562393436333739643861 /* AIAgentManager.swift */; };
-		646232353631383333366531 /* MeetingProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303135346664393230626466 /* MeetingProcessor.swift */; };
+		598C03EDE14C4D0598FDF8D8 /* Core/AISharedTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5213402D496D46EE866DE9B1 /* Core/AISharedTypes.swift */; };
+		613061306634616132363537 /* Vector/VectorDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373730663931643135393536 /* Vector/VectorDatabase.swift */; };
+		613739393561336339363861 /* Bridge/AIBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 353038313561353936306139 /* Bridge/AIBridge.m */; };
+		643031653433653630343663 /* Core/AIAgentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 613562393436333739643861 /* Core/AIAgentManager.swift */; };
+		646232353631383333366531 /* Agents/MeetingProcessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 303135346664393230626466 /* Agents/MeetingProcessor.swift */; };
 		7008230D296A9D5800E8978A /* BookmarkHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7008230C296A9D5800E8978A /* BookmarkHelper.swift */; };
 		700A18D8279DBBE40096C830 /* ApplicationSearcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 700A18D7279DBBE40096C830 /* ApplicationSearcher.swift */; };
 		700A18DA279DC17F0096C830 /* FileIcon.swift in Sources */ = {isa = PBXBuildFile; fileRef = 700A18D9279DC17F0096C830 /* FileIcon.swift */; };
@@ -77,33 +78,35 @@
 		70EA99EA2794967E008E54FD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EA99E92794967E008E54FD /* AppDelegate.swift */; };
 		70EFF77428D5F732009FE998 /* DoNotDisturb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70EFF77328D5F732009FE998 /* DoNotDisturb.swift */; };
 		70FEADF529E496BC008B5F36 /* processes.mm in Sources */ = {isa = PBXBuildFile; fileRef = 70FEADF429E496BC008B5F36 /* processes.mm */; };
-		9044B706DB284DC59D600959 /* CoreMLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BDD6CB3E8234C29956E1C22 /* CoreMLManager.swift */; };
+		9044B706DB284DC59D600959 /* Core/CoreMLManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1BDD6CB3E8234C29956E1C22 /* Core/CoreMLManager.swift */; };
 		AA45E5A772F1EC270ADCC02C /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 8893925B66AC7320A4EB378E /* PrivacyInfo.xcprivacy */; };
+		APPLEINTEL001234567890AB /* Core/AppleIntelligenceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = APPLEINTEL987654321CBA /* Core/AppleIntelligenceManager.swift */; };
 		FCC91F0E453D452DAB6D3634 /* LaunchAtLoginManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0E8CFF6940D4716ABAC73DE /* LaunchAtLoginManager.swift */; };
+		MODELACTORS001234567890AB /* Data/ModelActors.swift in Sources */ = {isa = PBXBuildFile; fileRef = MODELACTORS987654321CBA /* Data/ModelActors.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0300F122A010E4EAA87CFCBC /* Pods-macOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macOS.release.xcconfig"; path = "Target Support Files/Pods-macOS/Pods-macOS.release.xcconfig"; sourceTree = "<group>"; };
 		18BB6CB42E2EBF3A00CD709F /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.0.sdk/System/Library/Frameworks/FoundationModels.framework; sourceTree = DEVELOPER_DIR; };
-		1BDD6CB3E8234C29956E1C22 /* CoreMLManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/CoreMLManager.swift; sourceTree = "<group>"; };
-		303135346664393230626466 /* MeetingProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/MeetingProcessor.swift; sourceTree = "<group>"; };
-		303433653339653831353138 /* AICompatibilityLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AICompatibilityLayer.swift; sourceTree = "<group>"; };
-		353038313561353936306139 /* AIBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Bridge/AIBridge.m; sourceTree = "<group>"; };
-		356632393937366139313362 /* AIBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bridge/AIBridge.swift; sourceTree = "<group>"; };
-		373730663931643135393536 /* VectorDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vector/VectorDatabase.swift; sourceTree = "<group>"; };
-		376337636265643237356230 /* IntelligentSearchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/IntelligentSearchEngine.swift; sourceTree = "<group>"; };
+		1BDD6CB3E8234C29956E1C22 /* Core/CoreMLManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/CoreMLManager.swift; sourceTree = "<group>"; };
+		303135346664393230626466 /* Agents/MeetingProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/MeetingProcessor.swift; sourceTree = "<group>"; };
+		303433653339653831353138 /* Core/AICompatibilityLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AICompatibilityLayer.swift; sourceTree = "<group>"; };
+		353038313561353936306139 /* Bridge/AIBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Bridge/AIBridge.m; sourceTree = "<group>"; };
+		356632393937366139313362 /* Bridge/AIBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bridge/AIBridge.swift; sourceTree = "<group>"; };
+		373730663931643135393536 /* Vector/VectorDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Vector/VectorDatabase.swift; sourceTree = "<group>"; };
+		376337636265643237356230 /* Agents/IntelligentSearchEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/IntelligentSearchEngine.swift; sourceTree = "<group>"; };
 		421E6BED87E0A41196BFC936 /* Pods-macOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-macOS.debug.xcconfig"; path = "Target Support Files/Pods-macOS/Pods-macOS.debug.xcconfig"; sourceTree = "<group>"; };
 		514201492437B4B30078DB4F /* insig8-debug.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "insig8-debug.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		514201512437B4B40078DB4F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		514201542437B4B40078DB4F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		514201562437B4B40078DB4F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		514201592437B4B40078DB4F /* insig8.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = insig8.entitlements; sourceTree = "<group>"; };
-		5213402D496D46EE866DE9B1 /* AISharedTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AISharedTypes.swift; sourceTree = "<group>"; };
-		613562393436333739643861 /* AIAgentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AIAgentManager.swift; sourceTree = "<group>"; };
-		623465663732623130393065 /* AIBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bridge/AIBridge.h; sourceTree = "<group>"; };
-		633163303535386635383265 /* ScreenMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/ScreenMonitor.swift; sourceTree = "<group>"; };
-		633433336163326665653830 /* CommitmentTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/CommitmentTracker.swift; sourceTree = "<group>"; };
-		646663613734396435303763 /* AIDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/AIDataModels.swift; sourceTree = "<group>"; };
+		5213402D496D46EE866DE9B1 /* Core/AISharedTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AISharedTypes.swift; sourceTree = "<group>"; };
+		613562393436333739643861 /* Core/AIAgentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AIAgentManager.swift; sourceTree = "<group>"; };
+		623465663732623130393065 /* Bridge/AIBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bridge/AIBridge.h; sourceTree = "<group>"; };
+		633163303535386635383265 /* Agents/ScreenMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/ScreenMonitor.swift; sourceTree = "<group>"; };
+		633433336163326665653830 /* Agents/CommitmentTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Agents/CommitmentTracker.swift; sourceTree = "<group>"; };
+		646663613734396435303763 /* Data/AIDataModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/AIDataModels.swift; sourceTree = "<group>"; };
 		7008230C296A9D5800E8978A /* BookmarkHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarkHelper.swift; sourceTree = "<group>"; };
 		700A18D7279DBBE40096C830 /* ApplicationSearcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSearcher.swift; sourceTree = "<group>"; };
 		700A18D9279DC17F0096C830 /* FileIcon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileIcon.swift; sourceTree = "<group>"; };
@@ -173,9 +176,11 @@
 		70FEADF429E496BC008B5F36 /* processes.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = processes.mm; sourceTree = "<group>"; };
 		70FEADF629E496D1008B5F36 /* processes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = processes.h; sourceTree = "<group>"; };
 		8893925B66AC7320A4EB378E /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		APPLEINTEL987654321CBA /* Core/AppleIntelligenceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/AppleIntelligenceManager.swift; sourceTree = "<group>"; };
 		E0E8CFF6940D4716ABAC73DE /* LaunchAtLoginManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginManager.swift; sourceTree = "<group>"; };
 		E8AB4A585CFBE2A331F47C09 /* libPods-macOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-macOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		F7B925397C744F90B879232C /* EnhancedTextProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/EnhancedTextProcessor.swift; sourceTree = "<group>"; };
+		F7B925397C744F90B879232C /* Core/EnhancedTextProcessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Core/EnhancedTextProcessor.swift; sourceTree = "<group>"; };
+		MODELACTORS987654321CBA /* Data/ModelActors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data/ModelActors.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +188,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				180333052E30219100ED2305 /* FoundationModels.framework in Frameworks */,
 				706D6D572B3894E200941026 /* CoreLocation.framework in Frameworks */,
 				706D6D532B388C1700941026 /* CoreWLAN.framework in Frameworks */,
 				12135FE81829671B883665B9 /* libPods-macOS.a in Frameworks */,
@@ -235,20 +241,22 @@
 		653265613564383562643831 /* AI */ = {
 			isa = PBXGroup;
 			children = (
-				613562393436333739643861 /* AIAgentManager.swift */,
-				303433653339653831353138 /* AICompatibilityLayer.swift */,
-				F7B925397C744F90B879232C /* EnhancedTextProcessor.swift */,
-				1BDD6CB3E8234C29956E1C22 /* CoreMLManager.swift */,
-				5213402D496D46EE866DE9B1 /* AISharedTypes.swift */,
-				356632393937366139313362 /* AIBridge.swift */,
-				623465663732623130393065 /* AIBridge.h */,
-				353038313561353936306139 /* AIBridge.m */,
-				633433336163326665653830 /* CommitmentTracker.swift */,
-				376337636265643237356230 /* IntelligentSearchEngine.swift */,
-				303135346664393230626466 /* MeetingProcessor.swift */,
-				633163303535386635383265 /* ScreenMonitor.swift */,
-				646663613734396435303763 /* AIDataModels.swift */,
-				373730663931643135393536 /* VectorDatabase.swift */,
+				613562393436333739643861 /* Core/AIAgentManager.swift */,
+				303433653339653831353138 /* Core/AICompatibilityLayer.swift */,
+				F7B925397C744F90B879232C /* Core/EnhancedTextProcessor.swift */,
+				1BDD6CB3E8234C29956E1C22 /* Core/CoreMLManager.swift */,
+				APPLEINTEL987654321CBA /* Core/AppleIntelligenceManager.swift */,
+				5213402D496D46EE866DE9B1 /* Core/AISharedTypes.swift */,
+				356632393937366139313362 /* Bridge/AIBridge.swift */,
+				623465663732623130393065 /* Bridge/AIBridge.h */,
+				353038313561353936306139 /* Bridge/AIBridge.m */,
+				633433336163326665653830 /* Agents/CommitmentTracker.swift */,
+				376337636265643237356230 /* Agents/IntelligentSearchEngine.swift */,
+				303135346664393230626466 /* Agents/MeetingProcessor.swift */,
+				633163303535386635383265 /* Agents/ScreenMonitor.swift */,
+				646663613734396435303763 /* Data/AIDataModels.swift */,
+				MODELACTORS987654321CBA /* Data/ModelActors.swift */,
+				373730663931643135393536 /* Vector/VectorDatabase.swift */,
 			);
 			path = AI;
 			sourceTree = "<group>";
@@ -655,18 +663,20 @@
 				700A99F22C33D6E30049831F /* QRGenerator.swift in Sources */,
 				70E80B5F294C6EDE0094F1B5 /* MetadataExtractorError.swift in Sources */,
 				70B2D5902824254B0005D80A /* WindowManager.swift in Sources */,
-				643031653433653630343663 /* AIAgentManager.swift in Sources */,
-				323632356636613262623962 /* AIBridge.swift in Sources */,
-				613739393561336339363861 /* AIBridge.m in Sources */,
-				396266343831373861343535 /* CommitmentTracker.swift in Sources */,
-				346630363138303738303564 /* IntelligentSearchEngine.swift in Sources */,
-				646232353631383333366531 /* MeetingProcessor.swift in Sources */,
-				353466343036366330633732 /* ScreenMonitor.swift in Sources */,
-				393939656339336565653635 /* AIDataModels.swift in Sources */,
-				613061306634616132363537 /* VectorDatabase.swift in Sources */,
-				4645E6FFD6854016AD2531D8 /* EnhancedTextProcessor.swift in Sources */,
-				9044B706DB284DC59D600959 /* CoreMLManager.swift in Sources */,
-				598C03EDE14C4D0598FDF8D8 /* AISharedTypes.swift in Sources */,
+				643031653433653630343663 /* Core/AIAgentManager.swift in Sources */,
+				323632356636613262623962 /* Bridge/AIBridge.swift in Sources */,
+				613739393561336339363861 /* Bridge/AIBridge.m in Sources */,
+				396266343831373861343535 /* Agents/CommitmentTracker.swift in Sources */,
+				346630363138303738303564 /* Agents/IntelligentSearchEngine.swift in Sources */,
+				646232353631383333366531 /* Agents/MeetingProcessor.swift in Sources */,
+				353466343036366330633732 /* Agents/ScreenMonitor.swift in Sources */,
+				393939656339336565653635 /* Data/AIDataModels.swift in Sources */,
+				MODELACTORS001234567890AB /* Data/ModelActors.swift in Sources */,
+				613061306634616132363537 /* Vector/VectorDatabase.swift in Sources */,
+				4645E6FFD6854016AD2531D8 /* Core/EnhancedTextProcessor.swift in Sources */,
+				9044B706DB284DC59D600959 /* Core/CoreMLManager.swift in Sources */,
+				APPLEINTEL001234567890AB /* Core/AppleIntelligenceManager.swift in Sources */,
+				598C03EDE14C4D0598FDF8D8 /* Core/AISharedTypes.swift in Sources */,
 				FCC91F0E453D452DAB6D3634 /* LaunchAtLoginManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -706,7 +716,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
@@ -746,7 +756,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 15.1;
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.1.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",

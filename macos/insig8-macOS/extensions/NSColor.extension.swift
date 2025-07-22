@@ -7,8 +7,6 @@ extension NSColor {
       var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
       hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
 
-      var rgb: UInt32 = 0
-
       var r: CGFloat = 0.0
       var g: CGFloat = 0.0
       var b: CGFloat = 0.0
@@ -16,7 +14,7 @@ extension NSColor {
 
       let length = hexSanitized.count
 
-      guard Scanner(string: hexSanitized).scanHexInt32(&rgb) else { return nil }
+      guard let rgb = UInt32(hexSanitized, radix: 16) else { return nil }
 
       if length == 6 {
           r = CGFloat((rgb & 0xFF0000) >> 16) / 255.0

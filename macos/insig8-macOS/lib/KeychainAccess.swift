@@ -1399,11 +1399,21 @@ extension Options {
       query[AttributeAuthenticationType] = authenticationType.rawValue
     }
 
-    if #available(macOS 10.10, *) {
-      if authenticationPrompt != nil {
-        query[UseOperationPrompt] = authenticationPrompt
+    // Use modern LAContext approach instead of deprecated kSecUseOperationPrompt
+    #if !os(watchOS)
+      if #available(iOS 9.0, macOS 10.11, *) {
+        if authenticationPrompt != nil {
+          let context = LAContext()
+          context.localizedReason = authenticationPrompt!
+          query[UseAuthenticationContext] = context
+        }
+      } else if #available(macOS 10.10, *) {
+        // Fallback for older versions
+        if authenticationPrompt != nil {
+          query[UseOperationPrompt] = authenticationPrompt
+        }
       }
-    }
+    #endif
 
     #if !os(watchOS)
       if #available(iOS 9.0, macOS 10.11, *) {

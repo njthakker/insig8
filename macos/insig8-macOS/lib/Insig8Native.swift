@@ -2,6 +2,9 @@ import Foundation
 import HotKey
 // import LaunchAtLogin  // Temporarily removed due to Xcode beta package resolution issues
 
+// Global concurrency-safe accessibility constant
+nonisolated(unsafe) let trustedCheckKey = kAXTrustedCheckOptionPrompt.takeRetainedValue()
+
 #if canImport(React)
 import React
 #else
@@ -239,7 +242,6 @@ class Insig8Native: RCTEventEmitter {
     _ resolve: @escaping RCTPromiseResolveBlock,
     rejecter _: RCTPromiseRejectBlock
   ) {
-    let trustedCheckKey = kAXTrustedCheckOptionPrompt.takeRetainedValue()
     let promptKey = trustedCheckKey as NSString
     let options: NSDictionary = [
       promptKey: true

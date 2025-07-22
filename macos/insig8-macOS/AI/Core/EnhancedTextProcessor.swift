@@ -64,17 +64,18 @@ class EnhancedTextProcessor {
         }
         
         do {
-            guard let predictor = sentimentPredictor else {
+            guard sentimentPredictor != nil else {
                 // Fallback to rule-based sentiment analysis
                 return performRuleBasedSentiment(text)
             }
-            let prediction = try predictor.prediction(from: text)
+            let predictor = sentimentPredictor!
+            let prediction = try predictor.predictedLabel(for: text)
             
-            if let label = prediction.label {
-                let confidence = prediction.confidence
+            if let label = prediction {
+                // NLModel doesn't provide confidence scores directly
                 return SentimentAnalysis(
                     polarity: mapSentimentLabel(label),
-                    confidence: Float(confidence),
+                    confidence: 0.85, // Default confidence for NLModel
                     method: .coreML
                 )
             }

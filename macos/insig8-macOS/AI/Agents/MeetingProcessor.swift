@@ -7,16 +7,20 @@ import Combine
 import FoundationModels
 #endif
 
-@Observable
-class MeetingProcessor: ObservableObject {
+actor MeetingProcessor: ObservableObject {
     private let model: AILanguageModelSession?
     private let modelContainer: ModelContainer
     private let speechTranscriber: SpeechTranscriber
     private let audioCapture: AudioCaptureManager
     
     private var currentMeetingSession: MeetingSession?
-    private var isRecording = false
+    private var _isRecording = false
     private var cancellables = Set<AnyCancellable>()
+    
+    var isRecording: Bool {
+        get { _isRecording }
+        set { _isRecording = newValue }
+    }
     
     // AI Prompts
     private let actionItemPrompt = """
@@ -63,11 +67,13 @@ class MeetingProcessor: ObservableObject {
         self.speechTranscriber = SpeechTranscriber()
         self.audioCapture = AudioCaptureManager()
         
-        setupNotifications()
+        Task {
+            await setupNotifications()
+        }
     }
     
     func startMeetingRecording() async throws {
-        guard !isRecording else {
+        guard !_isRecording else {
             throw MeetingProcessorError.alreadyRecording
         }
         
@@ -86,7 +92,7 @@ class MeetingProcessor: ObservableObject {
         // Start real-time transcription
         try await speechTranscriber.startTranscription()
         
-        isRecording = true
+        _isRecording = true
         
         // Set up real-time processing
         setupRealTimeProcessing()
@@ -95,7 +101,7 @@ class MeetingProcessor: ObservableObject {
     }
     
     func stopMeetingRecording() async throws -> MeetingSession? {
-        guard isRecording, let meetingSession = currentMeetingSession else {
+        guard _isRecording, let meetingSession = currentMeetingSession else {
             throw MeetingProcessorError.notRecording
         }
         
@@ -116,7 +122,7 @@ class MeetingProcessor: ObservableObject {
         try context.save()
         
         // Reset state
-        isRecording = false
+        _isRecording = false
         currentMeetingSession = nil
         
         print("Meeting recording stopped and processed")
@@ -491,7 +497,7 @@ class SpeechTranscriber: ObservableObject {
         // Install audio tap with enhanced buffer processing
         inputNode.installTap(onBus: 0, bufferSize: 4096, format: recordingFormat) { [weak self] buffer, when in
             // Analyze audio levels for speaker detection
-            self?.analyzeAudioBuffer(buffer, timestamp: when.framePosition)
+            self?.analyzeAudioBuffer(buffer, timestamp: when.sampleTime)
             recognitionRequest.append(buffer)
         }
         

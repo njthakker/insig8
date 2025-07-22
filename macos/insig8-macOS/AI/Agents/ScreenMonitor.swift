@@ -11,15 +11,18 @@ import UniformTypeIdentifiers
 import ScreenCaptureKit
 #endif
 
-@Observable
-class ScreenMonitor: ObservableObject {
+actor ScreenMonitor: ObservableObject {
     private let commitmentTracker: CommitmentTracker
     private let vectorDB: VectorDatabase
     private let ocrProcessor: OCRProcessor
     private let contextAnalyzer: ContextAnalyzer
     
-    private var cancellables = Set<AnyCancellable>()
-    private var isMonitoring = false
+    private var _isMonitoring = false
+    
+    var isMonitoring: Bool {
+        get { _isMonitoring }
+        set { _isMonitoring = newValue }
+    }
     private var lastCaptureHash: String = ""
     private let captureInterval: TimeInterval = 5.0 // Capture every 5 seconds
     
@@ -35,25 +38,25 @@ class ScreenMonitor: ObservableObject {
     }
     
     func startMonitoring() async throws {
-        guard !isMonitoring else { return }
+        guard !_isMonitoring else { return }
         
         // Request screen recording permission
         try await requestScreenCapturePermission()
         
         // Start periodic screen capture
-        startPeriodicCapture()
+        await startPeriodicCapture()
         
-        isMonitoring = true
+        _isMonitoring = true
         print("Screen monitoring started")
     }
     
-    func stopMonitoring() {
-        guard isMonitoring else { return }
+    func stopMonitoring() async {
+        guard _isMonitoring else { return }
         
         captureTimer?.invalidate()
         captureTimer = nil
         
-        isMonitoring = false
+        _isMonitoring = false
         print("Screen monitoring stopped")
     }
     
@@ -111,7 +114,7 @@ class ScreenMonitor: ObservableObject {
             )
             
             // Create screen capture record
-            let screenCapture = ScreenCapture(
+            var screenCapture = ScreenCapture(
                 imageData: imageData,
                 extractedText: extractedText,
                 detectedApp: detectedApp,
@@ -122,10 +125,10 @@ class ScreenMonitor: ObservableObject {
             screenCapture.embedding = await generateEmbedding(for: extractedText)
             
             // Store in vector database
-            try await vectorDB.store(screenCapture)
+            try await vectorDB.store(&screenCapture)
             
             // Analyze for unresponded messages
-            await analyzeForUnrespondedMessages(screenCapture)
+            await analyzeForUnrespondedMessages(screenCapture.id, extractedText: extractedText, detectedApp: detectedApp)
             
             return screenCapture
             
@@ -194,10 +197,10 @@ class ScreenMonitor: ObservableObject {
     }
     
     
-    private func startPeriodicCapture() {
-        captureTimer = Timer.scheduledTimer(withTimeInterval: captureInterval, repeats: true) { _ in
-            Task {
-                await self.captureCurrentScreen()
+    nonisolated private func startPeriodicCapture() {
+        Task {
+            for await _ in Timer.publish(every: captureInterval, on: .main, in: .default).autoconnect().values {
+                await captureCurrentScreen()
             }
         }
     }
@@ -231,17 +234,17 @@ class ScreenMonitor: ObservableObject {
         return await embeddingGenerator.generateEmbedding(for: text)
     }
     
-    private func analyzeForUnrespondedMessages(_ capture: ScreenCapture) async {
+    private func analyzeForUnrespondedMessages(_ captureId: UUID, extractedText: String, detectedApp: String) async {
         let detectedMessages = await contextAnalyzer.detectMessages(
-            in: capture.extractedText,
-            app: capture.detectedApp
+            in: extractedText,
+            app: detectedApp
         )
         
         for message in detectedMessages {
             if message.isQuestionOrRequest {
                 // Create a commitment if this looks like something that needs a response
                 let messageContext = MessageContext(
-                    platform: capture.detectedApp,
+                    platform: detectedApp,
                     sender: message.sender,
                     timestamp: message.timestamp,
                     threadId: nil
@@ -437,19 +440,17 @@ class OCRProcessor {
                 return
             }
             
-            documentRequest.completionHandler = { request, error in
-                if let error = error {
-                    print("Document OCR error: \(error)")
-                    continuation.resume(returning: DocumentOCRResult(text: "", confidence: 0.0, layoutInfo: []))
-                    return
-                }
+            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
+            
+            do {
+                try handler.perform([documentRequest])
                 
                 var layoutInfo: [TextLayoutInfo] = []
                 var allText: [String] = []
                 var totalConfidence: Float = 0.0
                 var observationCount = 0
                 
-                for result in request.results ?? [] {
+                for result in documentRequest.results ?? [] {
                     guard let observation = result as? VNRecognizedTextObservation else { continue }
                     
                     if let topCandidate = observation.topCandidates(1).first {
@@ -476,12 +477,6 @@ class OCRProcessor {
                 )
                 
                 continuation.resume(returning: result)
-            }
-            
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            
-            do {
-                try handler.perform([documentRequest])
             } catch {
                 print("Failed to perform document OCR: \(error)")
                 continuation.resume(returning: DocumentOCRResult(text: "", confidence: 0.0, layoutInfo: []))
@@ -490,7 +485,7 @@ class OCRProcessor {
     }
     
     private func detectTextRegions(in cgImage: CGImage) async -> [TextRectangle] {
-        return await withCheckedContinuation { continuation in
+        return await withCheckedContinuation { (continuation: CheckedContinuation<[TextRectangle], Never>) in
             let request = VNDetectTextRectanglesRequest { request, error in
                 if let error = error {
                     print("Text rectangle detection error: \(error)")
